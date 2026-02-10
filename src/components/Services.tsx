@@ -6,14 +6,14 @@ import { Bot, Workflow, Database, Code2, Lightbulb, Plug } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const categories = ['All', 'AI', 'Automation', 'Development', 'Consulting']
+const categories = ['All', 'Agents', 'Automation', 'Strategy']
 
 const services = [
-  { num: '01', title: 'AI Agent Development', desc: 'Custom autonomous agents that handle complex workflows, make decisions, and take action — without human intervention.', cat: 'AI', icon: Bot, span: 'md:col-span-2 md:row-span-2' },
+  { num: '01', title: 'AI Agent Development', desc: 'Custom autonomous agents that handle complex workflows, make decisions, and take action — without human intervention.', cat: 'Agents', icon: Bot, span: 'md:col-span-2 md:row-span-2' },
   { num: '02', title: 'Workflow Automation', desc: 'End-to-end automation pipelines that connect your tools and eliminate manual work.', cat: 'Automation', icon: Workflow, span: '' },
-  { num: '03', title: 'RAG & Knowledge Systems', desc: 'Turn your documents into queryable, context-aware AI knowledge bases.', cat: 'AI', icon: Database, span: '' },
-  { num: '04', title: 'Full-Stack Development', desc: 'Modern web applications and APIs built with cutting-edge tech stacks, designed for scale.', cat: 'Development', icon: Code2, span: 'md:col-span-2' },
-  { num: '05', title: 'AI Strategy Consulting', desc: 'Expert guidance on where AI fits — practical roadmaps, not hype.', cat: 'Consulting', icon: Lightbulb, span: '' },
+  { num: '03', title: 'RAG & Knowledge Systems', desc: 'Turn your documents into queryable, context-aware AI knowledge bases.', cat: 'Agents', icon: Database, span: '' },
+  { num: '04', title: 'Full-Stack Development', desc: 'Modern web applications and APIs built with cutting-edge tech stacks, designed for scale.', cat: 'Automation', icon: Code2, span: 'md:col-span-2' },
+  { num: '05', title: 'AI Strategy Consulting', desc: 'Expert guidance on where AI fits — practical roadmaps, not hype.', cat: 'Strategy', icon: Lightbulb, span: '' },
   { num: '06', title: 'Custom Integrations', desc: 'Seamless connections between your existing tools and new AI capabilities.', cat: 'Automation', icon: Plug, span: '' },
 ]
 
