@@ -15,7 +15,7 @@ const industries = [
   { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems that cut costs.', color: 'from-orange/10 to-orange/5' },
 ]
 
-function TiltCard({ ind, index }: { ind: typeof industries[0]; index: number }) {
+function TiltCard({ ind }: { ind: typeof industries[0] }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const xTo = useRef<gsap.QuickToFunc | null>(null)
   const yTo = useRef<gsap.QuickToFunc | null>(null)
@@ -98,7 +98,7 @@ export default function Industries() {
   }, { scope: sectionRef })
 
   return (
-    <section id="industries" ref={sectionRef} className="py-24 md:py-32 relative z-10">
+    <section id="industries" ref={sectionRef} className="py-24 md:py-32 relative z-10 bg-black">
       <div className="max-w-7xl mx-auto px-6">
         <div className="ind-heading mb-16">
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">
@@ -108,8 +108,8 @@ export default function Industries() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {industries.map((ind, i) => (
-            <TiltCard key={ind.title} ind={ind} index={i} />
+          {industries.map((ind) => (
+            <TiltCard key={ind.title} ind={ind} />
           ))}
         </div>
       </div>

@@ -70,7 +70,7 @@ export default function CTASection() {
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden z-10">
+    <section ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden z-10 bg-black">
       <div className="absolute inset-0 bg-gradient-to-br from-orange/5 via-transparent to-orange/3" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">

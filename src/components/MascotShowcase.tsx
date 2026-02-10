@@ -74,7 +74,7 @@ export default function MascotShowcase() {
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="min-h-screen overflow-hidden relative z-10">
+    <section ref={sectionRef} className="min-h-screen overflow-hidden relative z-10 bg-black">
       <div ref={pinWrapRef} className="min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">

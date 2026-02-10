@@ -46,7 +46,7 @@ export default function WhyChooseUs() {
   }, { scope: sectionRef })
 
   return (
-    <section id="why-us" ref={sectionRef} className="bg-dark text-white py-24 md:py-32 relative z-10">
+    <section id="why-us" ref={sectionRef} className="bg-black text-white py-24 md:py-32 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="wcu-heading mb-20" style={{ clipPath: 'inset(0 0 0 0)' }}>
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">
