@@ -58,7 +58,7 @@ export default function WhyChooseUs() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {reasons.map((reason) => (
             <div key={reason.num} className="wcu-card relative group">
-              <div className="bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-3xl p-8 md:p-10 hover:bg-white/[0.08] hover:border-white/20 transition-all">
+              <div className="bg-[#0A0A0A] backdrop-blur-sm border border-white/10 rounded-3xl p-8 md:p-10 hover:border-orange/30 hover:shadow-[0_0_30px_rgba(255,107,44,0.1)] transition-all">
                 <span className="font-[var(--font-display)] text-6xl font-bold text-white/[0.04] absolute top-6 right-8">
                   {reason.num}
                 </span>

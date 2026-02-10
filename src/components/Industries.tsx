@@ -2,7 +2,7 @@ import { useRef, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ShoppingCart, Stethoscope, Building2, GraduationCap, BarChart3 } from 'lucide-react'
+import { ShoppingCart, Stethoscope, Building2, GraduationCap, BarChart3, Truck } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,6 +12,7 @@ const industries = [
   { icon: Building2, title: 'Real Estate', desc: 'Lead qualification bots, property matching algorithms, and automated market analysis.', color: 'from-orange/20 to-orange/5' },
   { icon: GraduationCap, title: 'Education', desc: 'AI tutoring systems, automated grading, and personalized learning path generation.', color: 'from-orange/10 to-orange/5' },
   { icon: BarChart3, title: 'Finance', desc: 'Fraud detection agents, automated reporting, and intelligent document processing pipelines.', color: 'from-orange/20 to-orange/5' },
+  { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems that cut costs.', color: 'from-orange/10 to-orange/5' },
 ]
 
 function TiltCard({ ind, index }: { ind: typeof industries[0]; index: number }) {
@@ -40,7 +41,7 @@ function TiltCard({ ind, index }: { ind: typeof industries[0]; index: number }) 
 
   return (
     <div
-      className={`ind-card ${index === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+      className="ind-card"
       style={{ perspective: 800 }}
     >
       <div
