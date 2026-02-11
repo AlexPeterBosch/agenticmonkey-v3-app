@@ -31,11 +31,11 @@ export default function PartnersMarquee() {
         <div className="flex animate-marquee whitespace-nowrap">
           {items.map((name, i) => (
             <span key={i} className="mx-8 md:mx-12 flex-shrink-0 flex items-center gap-8 md:gap-12 select-none">
-              <span className="text-lg md:text-xl font-[var(--font-display)] font-semibold tracking-tight text-white/20 hover:text-white/40 transition-colors duration-300 cursor-default">
+              <span className="text-lg md:text-2xl font-[var(--font-display)] font-bold tracking-tight text-white/30 hover:text-orange/60 transition-colors duration-300 cursor-default">
                 {name}
               </span>
               {i < items.length - 1 && (
-                <span className="text-white/8 text-sm">●</span>
+                <span className="text-orange/20 text-xs">◆</span>
               )}
             </span>
           ))}

@@ -108,7 +108,7 @@ export default function MascotShowcase() {
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-24 overflow-hidden relative z-10 bg-black border-t border-white/5">
+    <section ref={sectionRef} className="py-16 md:py-20 overflow-hidden relative z-10 bg-black border-t border-white/5">
       {/* Ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-orange/5 rounded-full blur-[120px]" />

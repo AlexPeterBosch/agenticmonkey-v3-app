@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Mascot3D from './Mascot3D'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -25,7 +26,7 @@ function SplitText({ text, className, id }: { text: string; className?: string; 
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
-  const mascotRef = useRef<HTMLImageElement>(null)
+  const mascotRef = useRef<HTMLDivElement>(null)
   const xTo = useRef<gsap.QuickToFunc | null>(null)
   const yTo = useRef<gsap.QuickToFunc | null>(null)
 
@@ -159,28 +160,27 @@ export default function Hero() {
             <div className="mascot-hero-glow animate-glow-pulse" />
           </div>
           <div className="animate-float">
-            <img
+            <div
               ref={mascotRef}
-              src="/mascot-hero-v3.png"
-              alt="AgenticMonkey — AI Automation Agency Mascot"
-              className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] object-contain relative z-10"
+              className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] relative z-10"
               style={{
                 willChange: 'transform',
                 filter: 'drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35))',
-                mixBlendMode: 'lighten',
               }}
-            />
+            >
+              <Mascot3D />
+            </div>
           </div>
           <div className="mascot-pedestal" />
         </div>
 
         {/* MONKEY */}
-        <div className="monkey-text">
+        <div className="monkey-text -mt-2">
           <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
             <SplitText
               text="MONKEY"
               id="monkey"
-              className="text-[clamp(3rem,12vw,10rem)] gradient-text"
+              className="text-[clamp(3.5rem,13vw,11rem)] gradient-text"
             />
           </h1>
         </div>

@@ -51,7 +51,7 @@ export default function Services() {
   }, { scope: sectionRef, dependencies: [active] })
 
   return (
-    <section id="services" ref={sectionRef} className="bg-black text-white py-24 md:py-32 relative z-10">
+    <section id="services" ref={sectionRef} className="bg-black text-white py-20 md:py-28 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="services-heading">
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">
@@ -82,10 +82,10 @@ export default function Services() {
               key={service.num}
               className={`service-card group ${service.span}`}
             >
-              <div className={`relative rounded-3xl p-8 md:p-10 border transition-all h-full flex flex-col justify-between overflow-hidden ${
+              <div className={`relative rounded-3xl p-8 md:p-10 border transition-all duration-500 h-full flex flex-col justify-between overflow-hidden group-hover:-translate-y-1 ${
                 service.featured 
-                  ? 'bg-gradient-to-br from-[#0A0A0A] to-[#111] border-orange/20 hover:border-orange/50 shadow-[0_0_40px_rgba(255,107,44,0.08)] hover:shadow-[0_0_60px_rgba(255,107,44,0.15)]'
-                  : 'bg-[#0A0A0A] border-white/10 hover:border-orange/30 hover:shadow-[0_0_30px_rgba(255,107,44,0.1)]'
+                  ? 'bg-gradient-to-br from-[#0A0A0A] to-[#111] border-orange/20 hover:border-orange/50 shadow-[0_0_40px_rgba(255,107,44,0.08)] hover:shadow-[0_0_60px_rgba(255,107,44,0.2)]'
+                  : 'bg-[#0A0A0A] border-white/10 hover:border-orange/30 hover:shadow-[0_0_40px_rgba(255,107,44,0.12)] hover:bg-[#0D0D0D]'
               }`}>
                 <span className={`font-[var(--font-display)] font-bold absolute -top-2 -right-2 ${
                   service.featured ? 'text-8xl md:text-9xl text-orange/[0.06]' : 'text-7xl md:text-8xl text-white/[0.03]'
