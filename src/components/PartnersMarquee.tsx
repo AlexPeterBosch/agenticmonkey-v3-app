@@ -1,43 +1,41 @@
-import { Brain, Sparkles, Chrome, Link, Code, Atom, FileCode, Triangle, Database } from 'lucide-react'
-
 const partners = [
-  { name: 'OpenAI', Icon: Brain },
-  { name: 'Anthropic', Icon: Sparkles },
-  { name: 'Google', Icon: Chrome },
-  { name: 'LangChain', Icon: Link },
-  { name: 'Python', Icon: Code },
-  { name: 'React', Icon: Atom },
-  { name: 'TypeScript', Icon: FileCode },
-  { name: 'Vercel', Icon: Triangle },
-  { name: 'Supabase', Icon: Database },
+  'OpenAI',
+  'Anthropic',
+  'Google Cloud',
+  'LangChain',
+  'Python',
+  'React',
+  'TypeScript',
+  'Vercel',
+  'Supabase',
+  'PostgreSQL',
+  'Redis',
+  'Docker',
 ]
 
 export default function PartnersMarquee() {
   const items = [...partners, ...partners, ...partners]
 
   return (
-    <section className="py-12 border-y border-white/5 bg-black relative z-10">
-      <div className="max-w-7xl mx-auto px-6 mb-6">
+    <section className="py-10 border-y border-white/5 bg-black relative z-10">
+      <div className="max-w-7xl mx-auto px-6 mb-5">
         <p className="text-xs uppercase tracking-[0.3em] text-muted font-[var(--font-display)] font-medium">
-          Trusted Technologies
+          Powered By
         </p>
       </div>
 
       <div className="relative overflow-hidden">
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
 
         <div className="flex animate-marquee whitespace-nowrap">
-          {items.map(({ name, Icon }, i) => (
-            <span key={i} className="mx-6 md:mx-10 flex-shrink-0 flex items-center gap-6 md:gap-10 select-none">
-              <span className="flex items-center gap-2 md:gap-3 group hover:text-white/50 transition-colors">
-                <Icon className="w-5 h-5 md:w-6 md:h-6 text-white/25 group-hover:text-white/50 transition-colors flex-shrink-0" />
-                <span className="text-xl md:text-2xl font-[var(--font-display)] font-bold tracking-tight text-white/25 group-hover:text-white/50 transition-colors">
-                  {name}
-                </span>
+          {items.map((name, i) => (
+            <span key={i} className="mx-8 md:mx-12 flex-shrink-0 flex items-center gap-8 md:gap-12 select-none">
+              <span className="text-lg md:text-xl font-[var(--font-display)] font-semibold tracking-tight text-white/20 hover:text-white/40 transition-colors duration-300 cursor-default">
+                {name}
               </span>
               {i < items.length - 1 && (
-                <span className="text-white/10 text-xl">&#x25C6;</span>
+                <span className="text-white/8 text-sm">●</span>
               )}
             </span>
           ))}

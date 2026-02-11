@@ -7,12 +7,12 @@ import { ShoppingCart, Stethoscope, Building2, GraduationCap, BarChart3, Truck }
 gsap.registerPlugin(ScrollTrigger)
 
 const industries = [
-  { icon: ShoppingCart, title: 'E-Commerce', desc: 'Automated customer support, inventory sync, and personalized shopping experiences.', accent: '#FF6B2C' },
-  { icon: Stethoscope, title: 'Healthcare', desc: 'Patient intake automation, document processing, and intelligent scheduling.', accent: '#FF6B2C' },
-  { icon: Building2, title: 'Real Estate', desc: 'Lead qualification bots, property matching, and automated market analysis.', accent: '#FF6B2C' },
-  { icon: GraduationCap, title: 'Education', desc: 'AI tutoring systems, automated grading, and personalized learning paths.', accent: '#FF6B2C' },
-  { icon: BarChart3, title: 'Finance', desc: 'Fraud detection agents, automated reporting, and intelligent document processing.', accent: '#FF6B2C' },
-  { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems.', accent: '#FF6B2C' },
+  { icon: ShoppingCart, title: 'E-Commerce', desc: 'Automated customer support, inventory sync, and personalized shopping experiences powered by AI agents.', span: 'md:col-span-2', featured: true },
+  { icon: Stethoscope, title: 'Healthcare', desc: 'Patient intake automation, document processing, and intelligent scheduling.', span: '', featured: false },
+  { icon: Building2, title: 'Real Estate', desc: 'Lead qualification bots, property matching, and automated market analysis.', span: '', featured: false },
+  { icon: GraduationCap, title: 'Education', desc: 'AI tutoring systems, automated grading, and personalized learning paths.', span: '', featured: false },
+  { icon: BarChart3, title: 'Finance', desc: 'Fraud detection agents, automated reporting, and intelligent document processing.', span: '', featured: false },
+  { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems.', span: 'md:col-span-2', featured: true },
 ]
 
 export default function Industries() {
@@ -64,24 +64,24 @@ export default function Industries() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {industries.map((ind) => {
             const Icon = ind.icon
             return (
-              <div key={ind.title} className="ind-card group">
+              <div key={ind.title} className={`ind-card group ${ind.span}`}>
                 <div
-                  className="bg-[#0A0A0A] rounded-3xl p-8 border border-white/8 hover:border-orange/20 transition-all duration-500 h-full hover:bg-[#111]"
-                  style={{ boxShadow: 'none' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 40px ${ind.accent}12` }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
+                  className={`rounded-3xl p-8 ${ind.featured ? 'md:p-10' : ''} border transition-all duration-500 h-full ${
+                    ind.featured
+                      ? 'bg-gradient-to-br from-[#0A0A0A] to-[#111] border-orange/15 hover:border-orange/30 hover:shadow-[0_0_50px_rgba(255,107,44,0.08)]'
+                      : 'bg-[#0A0A0A] border-white/8 hover:border-orange/20 hover:bg-[#111]'
+                  }`}
                 >
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300"
-                    style={{ background: `${ind.accent}15` }}
+                    className={`${ind.featured ? 'w-16 h-16' : 'w-14 h-14'} rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300 bg-orange/10`}
                   >
-                    <Icon className="w-7 h-7" style={{ color: ind.accent }} />
+                    <Icon className={`${ind.featured ? 'w-8 h-8' : 'w-7 h-7'} text-orange`} />
                   </div>
-                  <h3 className="font-[var(--font-display)] text-2xl font-bold mb-3 group-hover:text-orange transition-colors duration-300">
+                  <h3 className={`font-[var(--font-display)] ${ind.featured ? 'text-3xl' : 'text-2xl'} font-bold mb-3 group-hover:text-orange transition-colors duration-300`}>
                     {ind.title}
                   </h3>
                   <p className="text-muted text-base leading-relaxed font-[var(--font-body)]">
