@@ -76,7 +76,7 @@ export default function HowItWorks() {
   }, { scope: sectionRef })
 
   return (
-    <section id="how-it-works" ref={sectionRef} className="py-24 md:py-32 bg-black relative z-10 overflow-hidden">
+    <section id="how-it-works" ref={sectionRef} className="py-16 md:py-24 bg-black relative z-10 overflow-hidden border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="hiw-heading text-center mb-20">
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">

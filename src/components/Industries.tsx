@@ -70,7 +70,7 @@ export default function Industries() {
             return (
               <div key={ind.title} className="ind-card group">
                 <div
-                  className="bg-[#080808] rounded-3xl p-8 border border-white/5 hover:border-white/15 transition-all duration-500 h-full hover:bg-[#0A0A0A]"
+                  className="bg-[#0A0A0A] rounded-3xl p-8 border border-white/8 hover:border-orange/20 transition-all duration-500 h-full hover:bg-[#111]"
                   style={{ boxShadow: 'none' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 40px ${ind.accent}12` }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
