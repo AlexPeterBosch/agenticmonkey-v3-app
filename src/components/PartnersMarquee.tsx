@@ -1,4 +1,4 @@
-const partners = ['OpenAI', 'Anthropic', 'Google', 'LangChain', 'Vercel', 'Supabase', 'Python', 'React', 'TypeScript']
+﻿const partners = ['OpenAI', 'Anthropic', 'Google', 'LangChain', 'Vercel', 'Supabase', 'Python', 'React', 'TypeScript']
 
 export default function PartnersMarquee() {
   const items = [...partners, ...partners, ...partners]
@@ -22,7 +22,7 @@ export default function PartnersMarquee() {
                 {name}
               </span>
               {i < items.length - 1 && (
-                <span className="text-white/10 text-xl">·</span>
+                <span className="text-white/10 text-xl">&#x25C6;</span>
               )}
             </span>
           ))}
