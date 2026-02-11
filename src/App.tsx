@@ -9,7 +9,7 @@ import MascotShowcase from './components/MascotShowcase'
 import HowItWorks from './components/HowItWorks'
 import Industries from './components/Industries'
 import WhyChooseUs from './components/WhyChooseUs'
-import Testimonials from './components/Testimonials'
+// import Testimonials from './components/Testimonials'
 import CTASection from './components/CTASection'
 import Footer from './components/Footer'
 
@@ -27,7 +27,7 @@ function App() {
         <HowItWorks />
         <Industries />
         <WhyChooseUs />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <CTASection />
         <Footer />
       </div>

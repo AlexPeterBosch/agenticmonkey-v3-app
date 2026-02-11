@@ -16,11 +16,12 @@ export default function CTASection() {
     gsap.from('.cta-heading', {
       x: -100,
       opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
       scrollTrigger: {
         trigger: '.cta-heading',
         start: 'top 85%',
-        end: 'top 50%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -28,6 +29,9 @@ export default function CTASection() {
     gsap.from('.cta-text', {
       opacity: 0,
       y: 20,
+      duration: 0.8,
+      ease: 'power2.out',
+      delay: 0.2,
       scrollTrigger: {
         trigger: '.cta-text',
         start: 'top 85%',
@@ -38,6 +42,9 @@ export default function CTASection() {
     gsap.from('.cta-button', {
       opacity: 0,
       y: 20,
+      duration: 0.8,
+      ease: 'power2.out',
+      delay: 0.3,
       scrollTrigger: {
         trigger: '.cta-button',
         start: 'top 90%',

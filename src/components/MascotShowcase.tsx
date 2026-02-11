@@ -19,8 +19,7 @@ export default function MascotShowcase() {
       scrollTrigger: {
         trigger: '.showcase-mascot',
         start: 'top 80%',
-        end: 'top 50%',
-        scrub: 0.6,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -33,8 +32,7 @@ export default function MascotShowcase() {
       scrollTrigger: {
         trigger: '.showcase-line-1',
         start: 'top 85%',
-        end: 'top 55%',
-        scrub: 0.8,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -43,11 +41,11 @@ export default function MascotShowcase() {
       opacity: 0,
       duration: 1,
       ease: 'power2.out',
+      delay: 0.2,
       scrollTrigger: {
         trigger: '.showcase-line-2',
         start: 'top 85%',
-        end: 'top 55%',
-        scrub: 0.8,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -57,11 +55,11 @@ export default function MascotShowcase() {
       y: 30,
       duration: 0.8,
       ease: 'power2.out',
+      delay: 0.4,
       scrollTrigger: {
         trigger: '.showcase-stats',
         start: 'top 85%',
-        end: 'top 60%',
-        scrub: 0.8,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -100,17 +98,17 @@ export default function MascotShowcase() {
       y: 20,
       duration: 0.8,
       ease: 'power2.out',
+      delay: 0.3,
       scrollTrigger: {
         trigger: '.showcase-desc',
         start: 'top 85%',
-        end: 'top 60%',
-        scrub: 0.6,
+        toggleActions: 'play none none none',
       },
     })
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-32 overflow-hidden relative z-10 bg-black">
+    <section ref={sectionRef} className="py-16 md:py-20 overflow-hidden relative z-10 bg-black">
       {/* Ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-orange/5 rounded-full blur-[120px]" />

@@ -30,8 +30,7 @@ export default function Services() {
       scrollTrigger: {
         trigger: '.services-heading',
         start: 'top 85%',
-        end: 'top 50%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 

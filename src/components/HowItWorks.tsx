@@ -34,11 +34,12 @@ export default function HowItWorks() {
     gsap.from('.hiw-heading', {
       x: 100,
       opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
       scrollTrigger: {
         trigger: '.hiw-heading',
         start: 'top 85%',
-        end: 'top 50%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -63,12 +64,12 @@ export default function HowItWorks() {
       gsap.from(step, {
         opacity: 0,
         y: 40,
-        duration: 0.6,
+        duration: 0.8,
+        ease: 'power2.out',
         scrollTrigger: {
           trigger: step,
           start: 'top 85%',
-          end: 'top 60%',
-          scrub: true,
+          toggleActions: 'play none none none',
         },
       })
     })

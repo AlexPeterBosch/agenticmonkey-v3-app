@@ -22,8 +22,7 @@ export default function ProblemSolution() {
       scrollTrigger: {
         trigger: '.ps-headline',
         start: 'top 80%',
-        end: 'top 40%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -32,11 +31,11 @@ export default function ProblemSolution() {
       opacity: 0,
       duration: 1.2,
       ease: 'power3.out',
+      delay: 0.2,
       scrollTrigger: {
         trigger: '.ps-subline',
         start: 'top 85%',
-        end: 'top 45%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 

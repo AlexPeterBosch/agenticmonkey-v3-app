@@ -21,12 +21,12 @@ export default function WhyChooseUs() {
     gsap.from('.wcu-heading', {
       clipPath: 'inset(0 100% 0 0)',
       opacity: 0,
-      duration: 1,
+      duration: 1.2,
+      ease: 'power3.out',
       scrollTrigger: {
         trigger: '.wcu-heading',
         start: 'top 80%',
-        end: 'top 40%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 
