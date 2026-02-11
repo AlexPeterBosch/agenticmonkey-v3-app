@@ -184,7 +184,7 @@ export default function Hero() {
 
         {/* Subtitle */}
         <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
-          Engineering Autonomy
+          Engineers of Autonomy
         </p>
 
         {/* CTA buttons */}
