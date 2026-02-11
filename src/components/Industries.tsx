@@ -8,11 +8,11 @@ gsap.registerPlugin(ScrollTrigger)
 
 const industries = [
   { icon: ShoppingCart, title: 'E-Commerce', desc: 'Automated customer support, inventory sync, and personalized shopping experiences.', accent: '#FF6B2C' },
-  { icon: Stethoscope, title: 'Healthcare', desc: 'Patient intake automation, document processing, and intelligent scheduling.', accent: '#00D4FF' },
+  { icon: Stethoscope, title: 'Healthcare', desc: 'Patient intake automation, document processing, and intelligent scheduling.', accent: '#FF6B2C' },
   { icon: Building2, title: 'Real Estate', desc: 'Lead qualification bots, property matching, and automated market analysis.', accent: '#FF6B2C' },
-  { icon: GraduationCap, title: 'Education', desc: 'AI tutoring systems, automated grading, and personalized learning paths.', accent: '#00D4FF' },
+  { icon: GraduationCap, title: 'Education', desc: 'AI tutoring systems, automated grading, and personalized learning paths.', accent: '#FF6B2C' },
   { icon: BarChart3, title: 'Finance', desc: 'Fraud detection agents, automated reporting, and intelligent document processing.', accent: '#FF6B2C' },
-  { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems.', accent: '#00D4FF' },
+  { icon: Truck, title: 'Logistics', desc: 'Route optimization, inventory forecasting, and automated dispatch systems.', accent: '#FF6B2C' },
 ]
 
 export default function Industries() {
