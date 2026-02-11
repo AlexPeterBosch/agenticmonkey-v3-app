@@ -91,8 +91,22 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 25s linear infinite;
 }
 
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: mascot-float 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35)); }
+  50% { filter: drop-shadow(0 20px 80px rgba(255, 107, 44, 0.55)) drop-shadow(0 0 30px rgba(255, 107, 44, 0.25)); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
 }
 
 .animate-pulse-glow {

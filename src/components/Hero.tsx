@@ -156,18 +156,21 @@ export default function Hero() {
         <div className="relative z-20 -my-4 md:-my-12" style={{ perspective: 1000 }}>
           {/* Pulsing glow behind mascot */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="mascot-hero-glow" />
+            <div className="mascot-hero-glow animate-glow-pulse" />
           </div>
-          <img
-            ref={mascotRef}
-            src="/mascot-hero-v3.png"
-            alt="AgenticMonkey — AI Automation Agency Mascot"
-            className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] object-contain relative z-10"
-            style={{
-              willChange: 'transform',
-              filter: 'drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35))',
-            }}
-          />
+          <div className="animate-float">
+            <img
+              ref={mascotRef}
+              src="/mascot-hero-v3.png"
+              alt="AgenticMonkey — AI Automation Agency Mascot"
+              className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] object-contain relative z-10"
+              style={{
+                willChange: 'transform',
+                filter: 'drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35))',
+                mixBlendMode: 'lighten',
+              }}
+            />
+          </div>
           <div className="mascot-pedestal" />
         </div>
 
