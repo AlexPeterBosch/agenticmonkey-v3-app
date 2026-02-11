@@ -15,7 +15,7 @@ export default function MascotShowcase() {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=80%',
+        end: '+=60%',
         pin: true,
         scrub: 1,
       },
@@ -74,12 +74,12 @@ export default function MascotShowcase() {
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="min-h-screen overflow-hidden relative z-10 bg-black">
+    <section ref={sectionRef} className="min-h-[80vh] overflow-hidden relative z-10 bg-black">
       {/* Ambient glow for the entire section */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-orange/5 rounded-full blur-[120px]" />
       </div>
-      <div ref={pinWrapRef} className="min-h-screen flex items-center">
+      <div ref={pinWrapRef} className="min-h-[80vh] flex items-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Mascot */}

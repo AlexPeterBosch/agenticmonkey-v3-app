@@ -87,7 +87,7 @@ export default function HowItWorks() {
         <div className="hiw-steps relative max-w-4xl mx-auto">
           {/* SVG connecting line — left side on desktop */}
           <svg
-            className="absolute left-8 top-0 h-full w-4 hidden md:block"
+            className="absolute left-[2.25rem] top-0 h-full w-4 hidden md:block"
             preserveAspectRatio="none"
           >
             <line
@@ -110,7 +110,7 @@ export default function HowItWorks() {
               >
                 <div className="relative bg-[#0A0A0A] rounded-3xl p-8 md:p-10 border border-white/10 hover:border-orange/30 transition-all hover:shadow-[0_0_30px_rgba(255,107,44,0.1)]">
                   {/* Step number dot on the line */}
-                  <div className="hidden md:flex absolute -left-16 top-10 w-8 h-8 rounded-full bg-orange items-center justify-center text-xs font-bold text-white shadow-[0_0_20px_rgba(255,107,44,0.4)]">
+                  <div className="hidden md:flex absolute -left-16 top-8 w-8 h-8 rounded-full bg-orange items-center justify-center text-xs font-bold text-white shadow-[0_0_20px_rgba(255,107,44,0.4)]">
                     {step.num}
                   </div>
 

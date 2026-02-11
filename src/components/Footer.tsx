@@ -71,7 +71,7 @@ export default function Footer() {
               <a href="https://x.com/AlexPeterBosch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 hover:bg-orange/20 flex items-center justify-center transition-all">
                 <Twitter className="w-4 h-4 text-white/50 hover:text-white" />
               </a>
-              <a href="https://github.com/agenticmonkey" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 hover:bg-orange/20 flex items-center justify-center transition-all">
+              <a href="https://github.com/AlexPeterBosch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 hover:bg-orange/20 flex items-center justify-center transition-all">
                 <Github className="w-4 h-4 text-white/50 hover:text-white" />
               </a>
             </div>

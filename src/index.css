@@ -121,7 +121,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-stroke-visible {
-  -webkit-text-stroke: 3px rgba(255, 255, 255, 0.7);
+  -webkit-text-stroke: 4px rgba(255, 255, 255, 0.8);
   color: rgba(255, 255, 255, 0.08);
   paint-order: stroke fill;
 }
@@ -227,7 +227,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #FF6B2C, #FF9A6C);
+  background: linear-gradient(135deg, #FF6B2C, #FFAA70);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

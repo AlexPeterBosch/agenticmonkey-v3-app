@@ -130,7 +130,7 @@ export default function Industries() {
         <div className="ind-heading mb-16">
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">
             Industries
-            <span className="text-stroke-visible block">We Serve</span>
+            <span className="gradient-text block">We Serve</span>
           </h2>
         </div>
 

@@ -19,7 +19,7 @@ export default function PartnersMarquee() {
     <section className="py-12 border-y border-white/5 bg-black relative z-10">
       <div className="max-w-7xl mx-auto px-6 mb-6">
         <p className="text-xs uppercase tracking-[0.3em] text-muted font-[var(--font-display)] font-medium">
-          Our Tech Stack
+          Trusted Technologies
         </p>
       </div>
 
