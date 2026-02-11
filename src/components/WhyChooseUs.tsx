@@ -2,14 +2,15 @@ import { useRef } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Zap, Shield, Key, Brain } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const reasons = [
-  { title: 'Speed Over Perfection', desc: 'We ship fast. Your first agent prototype is ready in days, not months.', accent: 'text-orange', num: '01' },
-  { title: 'Production-Grade', desc: 'No science experiments. Everything we build is production-ready from day one.', accent: 'text-orange', num: '02' },
-  { title: 'Full Ownership', desc: 'Your code. Your agents. Your IP. We build it and hand over the keys.', accent: 'text-orange', num: '03' },
-  { title: 'AI-Native Team', desc: "We don't \"also do AI\". AI agents are all we do, every day, all day.", accent: 'text-orange', num: '04' },
+  { title: 'Speed Over Perfection', desc: 'We ship fast. Your first agent prototype is ready in days, not months.', accent: 'text-orange', num: '01', Icon: Zap },
+  { title: 'Production-Grade', desc: 'No science experiments. Everything we build is production-ready from day one.', accent: 'text-orange', num: '02', Icon: Shield },
+  { title: 'Full Ownership', desc: 'Your code. Your agents. Your IP. We build it and hand over the keys.', accent: 'text-orange', num: '03', Icon: Key },
+  { title: 'AI-Native Team', desc: "We don't \"also do AI\". AI agents are all we do, every day, all day.", accent: 'text-orange', num: '04', Icon: Brain },
 ]
 
 export default function WhyChooseUs() {
@@ -62,6 +63,9 @@ export default function WhyChooseUs() {
                 <span className="font-[var(--font-display)] text-6xl font-bold text-white/[0.04] absolute top-6 right-8">
                   {reason.num}
                 </span>
+                <div className="w-12 h-12 rounded-xl bg-orange/10 group-hover:bg-orange/20 flex items-center justify-center mb-6 transition-all group-hover:scale-110">
+                  <reason.Icon className="w-6 h-6 text-orange" />
+                </div>
                 <h3 className={`font-[var(--font-display)] text-2xl md:text-4xl font-bold ${reason.accent} mb-4`}>
                   {reason.title}
                 </h3>

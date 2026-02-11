@@ -1,4 +1,16 @@
-﻿const partners = ['OpenAI', 'Anthropic', 'Google', 'LangChain', 'Vercel', 'Supabase', 'Python', 'React', 'TypeScript']
+import { Brain, Sparkles, Chrome, Link, Code, Atom, FileCode, Triangle, Database } from 'lucide-react'
+
+const partners = [
+  { name: 'OpenAI', Icon: Brain },
+  { name: 'Anthropic', Icon: Sparkles },
+  { name: 'Google', Icon: Chrome },
+  { name: 'LangChain', Icon: Link },
+  { name: 'Python', Icon: Code },
+  { name: 'React', Icon: Atom },
+  { name: 'TypeScript', Icon: FileCode },
+  { name: 'Vercel', Icon: Triangle },
+  { name: 'Supabase', Icon: Database },
+]
 
 export default function PartnersMarquee() {
   const items = [...partners, ...partners, ...partners]
@@ -16,10 +28,13 @@ export default function PartnersMarquee() {
         <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
 
         <div className="flex animate-marquee whitespace-nowrap">
-          {items.map((name, i) => (
+          {items.map(({ name, Icon }, i) => (
             <span key={i} className="mx-6 md:mx-10 flex-shrink-0 flex items-center gap-6 md:gap-10 select-none">
-              <span className="text-2xl md:text-3xl font-[var(--font-display)] font-bold tracking-tight text-white/25 hover:text-white/50 transition-colors">
-                {name}
+              <span className="flex items-center gap-2 md:gap-3 group hover:text-white/50 transition-colors">
+                <Icon className="w-5 h-5 md:w-6 md:h-6 text-white/25 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                <span className="text-xl md:text-2xl font-[var(--font-display)] font-bold tracking-tight text-white/25 group-hover:text-white/50 transition-colors">
+                  {name}
+                </span>
               </span>
               {i < items.length - 1 && (
                 <span className="text-white/10 text-xl">&#x25C6;</span>

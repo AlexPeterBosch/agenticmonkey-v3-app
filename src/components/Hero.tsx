@@ -177,7 +177,7 @@ export default function Hero() {
             <SplitText
               text="MONKEY"
               id="monkey"
-              className="text-[clamp(3rem,12vw,10rem)] text-stroke-visible"
+              className="text-[clamp(3rem,12vw,10rem)] gradient-text"
             />
           </h1>
         </div>
