@@ -10,11 +10,11 @@ const BOOKING_URL = 'https://cal.com/alex-bosch-nodozz/30min'
 
 function SplitText({ text, className, id }: { text: string; className?: string; id: string }) {
   return (
-    <span className={`inline-block overflow-hidden ${className || ''}`}>
+    <span className="inline-block overflow-hidden">
       {text.split('').map((char, i) => (
         <span
           key={i}
-          className={`${id}-char inline-block`}
+          className={`${id}-char inline-block ${className || ''}`}
           style={{ display: 'inline-block' }}
         >
           {char === ' ' ? '\u00A0' : char}
