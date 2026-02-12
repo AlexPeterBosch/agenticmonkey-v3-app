@@ -63,10 +63,10 @@ export default function Hero() {
       delay: 0.8,
     })
 
-    // Fade out the overlay
+    // Fade out the overlay — immediate, no dead pause
     tl.to(overlayRef.current, {
       opacity: 0,
-      duration: 0.3,
+      duration: 0.5,
       onComplete: () => {
         if (overlayRef.current) {
           overlayRef.current.style.display = 'none'
@@ -75,18 +75,20 @@ export default function Hero() {
     })
 
     // Step 3: "AGENTIC" slides DOWN from top — SLOW elevator
+    // duration 4s so it crawls down gracefully
     tl.to(agenticRef.current, {
       y: 0,
       duration: 4,
       ease: 'power2.inOut',
-    }, '-=0.1')
+    }, '-=0.3')
 
-    // Step 4: "MONKEY" rises UP — starts AFTER AGENTIC has fully arrived
+    // Step 4: "MONKEY" rises UP — starts as soon as AGENTIC becomes visible
+    // AGENTIC starts at -100vh, so ~0.8s in it peeks onto screen → MONKEY starts
     tl.to(monkeyBlockRef.current, {
       y: 0,
-      duration: 3.5,
+      duration: 4,
       ease: 'power2.inOut',
-    })
+    }, '<0.8')
 
     // Step 5: BOUNCE impact when MONKEY arrives
     tl.to('.monkey-text', {
@@ -201,8 +203,8 @@ export default function Hero() {
           </h1>
         </div>
         
-        {/* Space for mascot (Phase 2) */}
-        <div className="h-16 md:h-24" />
+        {/* Space for mascot video (Phase 2) */}
+        <div className="h-32 md:h-48 lg:h-64" />
         
         {/* MONKEY + subtitle + CTA - rises from bottom */}
         <div 
