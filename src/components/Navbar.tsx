@@ -21,7 +21,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 pt-6 px-4 md:px-6 flex justify-center pointer-events-none">
+      <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 pt-6 px-4 md:px-6 flex justify-center pointer-events-none" style={{ opacity: 0, transform: 'translateY(-20px)' }}>
         <div className="pointer-events-auto bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] rounded-full px-5 py-3 md:px-6 md:py-3 flex items-center justify-between gap-6 md:gap-8 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] w-full max-w-4xl">
           <a href="#" className="flex items-center gap-3">
             {/* <img src="/monkey-mascot.png" alt="AgenticMonkey" className="w-8 h-8 object-contain" /> */}

@@ -32,8 +32,12 @@ export default function Hero() {
   const monkeyBlockRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    // Hide navbar initially
-    gsap.set('nav', { opacity: 0, y: -20 })
+    // Hide navbar immediately — force it hidden even if it mounted late
+    const navEl = document.querySelector('nav')
+    if (navEl) {
+      navEl.style.opacity = '0'
+      navEl.style.transform = 'translateY(-20px)'
+    }
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
@@ -70,19 +74,19 @@ export default function Hero() {
       },
     })
 
-    // Step 3: "AGENTIC" slides DOWN from top — SLOW elevator (4x slower)
+    // Step 3: "AGENTIC" slides DOWN from top — SLOW elevator
     tl.to(agenticRef.current, {
       y: 0,
       duration: 4,
       ease: 'power2.inOut',
     }, '-=0.1')
 
-    // Step 4: "MONKEY" rises UP — starts when AGENTIC is ~25% down (1s into its 4s journey)
+    // Step 4: "MONKEY" rises UP — starts AFTER AGENTIC has fully arrived
     tl.to(monkeyBlockRef.current, {
       y: 0,
       duration: 3.5,
       ease: 'power2.inOut',
-    }, '<1')
+    })
 
     // Step 5: BOUNCE impact when MONKEY arrives
     tl.to('.monkey-text', {
