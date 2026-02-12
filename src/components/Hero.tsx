@@ -34,26 +34,26 @@ export default function Hero() {
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // Step 1: Welcome Flash (0s - 0.8s)
+    // Step 1: Welcome Flash (0s - 1.5s)
     tl.to(welcomeRef.current, {
       opacity: 1,
-      duration: 0.15,
+      duration: 0.3,
     })
     .to(welcomeRef.current, {
       opacity: 0,
-      duration: 0.15,
-      delay: 0.5,
+      duration: 0.3,
+      delay: 1.0,
     })
 
-    // Step 2: "2" flash (0.8s - 1.3s)
+    // Step 2: "TO" flash (1.6s - 2.8s)
     tl.to(countRef.current, {
       opacity: 1,
-      duration: 0.1,
+      duration: 0.3,
     })
     .to(countRef.current, {
       opacity: 0,
-      duration: 0.1,
-      delay: 0.3,
+      duration: 0.3,
+      delay: 0.8,
     })
 
     // Fade out the overlay
@@ -67,55 +67,55 @@ export default function Hero() {
       },
     })
 
-    // Step 3: "AGENTIC" slides DOWN from top (1.3s - 2.3s)
+    // Step 3: "AGENTIC" slides DOWN from top
     tl.to(agenticRef.current, {
       y: 0,
-      duration: 1,
+      duration: 1.2,
       ease: 'power3.out',
-    }, '1.3')
+    }, '-=0.1')
 
-    // Step 4: "MONKEY" + subtitle + CTAs rise UP from bottom (2.0s - 3.0s)
+    // Step 4: "MONKEY" + subtitle + CTAs rise UP from bottom
     tl.to(monkeyBlockRef.current, {
       y: 0,
-      duration: 1,
+      duration: 1.2,
       ease: 'power3.out',
-    }, '2.0')
+    }, '<0.3')
 
-    // Step 5: BOUNCE impact (3.0s - 3.5s)
+    // Step 5: BOUNCE impact when MONKEY arrives
     tl.to('.monkey-text', {
       y: -20,
       scaleY: 0.9,
       scaleX: 1.05,
-      duration: 0.25,
+      duration: 0.15,
       ease: 'power2.in',
-    }, '3.0')
+    })
     .to('.monkey-text', {
       y: 0,
       scaleY: 1,
       scaleX: 1,
-      duration: 0.5,
+      duration: 0.6,
       ease: 'bounce.out',
     })
 
-    // Step 6: Subtitle + CTA fade in (3.2s - 3.8s)
+    // Step 6: Subtitle + CTA settle
     tl.from('.hero-subtitle', {
       opacity: 0,
       y: 20,
-      duration: 0.4,
+      duration: 0.5,
       ease: 'power2.out',
-    }, '3.2')
+    }, '<0.1')
     .from('.hero-cta', {
       opacity: 0,
       y: 20,
-      duration: 0.4,
+      duration: 0.5,
       ease: 'power2.out',
-    }, '3.3')
+    }, '<0.1')
 
     // Scroll indicator
     tl.from('.scroll-indicator', {
       opacity: 0,
       duration: 0.5,
-    }, '3.5')
+    })
 
     // Parallax on scroll
     ScrollTrigger.create({
@@ -137,11 +137,11 @@ export default function Hero() {
     <section ref={heroRef} className="relative min-h-screen overflow-hidden">
       {/* Intro overlay */}
       <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
-        <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-6xl md:text-8xl font-bold uppercase opacity-0">
+        <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
           WELCOME
         </span>
-        <span ref={countRef} className="text-white font-[var(--font-display)] text-6xl md:text-8xl font-bold absolute opacity-0">
-          2
+        <span ref={countRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase absolute opacity-0">
+          TO
         </span>
       </div>
 
