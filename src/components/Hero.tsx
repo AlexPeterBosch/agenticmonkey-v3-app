@@ -2,8 +2,7 @@ import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Mascot3D from './Mascot3D'
-
+import ParticleField from './ParticleField'
 gsap.registerPlugin(ScrollTrigger)
 
 const BOOKING_URL = 'https://cal.com/alex-bosch-nodozz/30min'
@@ -27,8 +26,8 @@ function SplitText({ text, className, id }: { text: string; className?: string; 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
   const mascotRef = useRef<HTMLDivElement>(null)
-  const xTo = useRef<gsap.QuickToFunc | null>(null)
-  const yTo = useRef<gsap.QuickToFunc | null>(null)
+  const tubeRef = useRef<HTMLDivElement>(null)
+  const tubeTrackRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
@@ -41,13 +40,20 @@ export default function Hero() {
       stagger: 0.05,
     })
 
-    // Mascot scale in
+    // Mascot dramatic entrance (scale from 0.5 → 1, opacity 0 → 1, with overshoot)
     tl.from(mascotRef.current, {
-      scale: 0.8,
+      scale: 0.5,
       opacity: 0,
-      duration: 1,
-      ease: 'back.out(1.7)',
+      y: 80,
+      duration: 1.2,
+      ease: 'back.out(2)',
     }, '-=0.5')
+
+    // Tube lights up
+    tl.from(tubeRef.current, {
+      opacity: 0,
+      duration: 0.8,
+    }, '-=0.8')
 
     // MONKEY chars stagger in
     tl.from('.monkey-char', {
@@ -78,49 +84,43 @@ export default function Hero() {
       duration: 0.5,
     })
 
-    // Parallax on scroll
-    ScrollTrigger.create({
-      trigger: heroRef.current,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true,
-      onUpdate: (self) => {
-        const p = self.progress
-        gsap.set('.agentic-text', { y: p * -80 })
-        gsap.set('.monkey-text', { y: p * -60 })
-        gsap.set(mascotRef.current, { y: p * -200 })
-        gsap.set('.hero-subtitle', { y: p * -40 })
-        gsap.set('.hero-cta', { y: p * -30 })
-      },
-    })
   }, { scope: heroRef })
 
-  // Mouse follow tilt
+  // Mascot rides down the tube on scroll with parallax depth effect
   useEffect(() => {
-    if (!mascotRef.current) return
-    xTo.current = gsap.quickTo(mascotRef.current, 'rotateY', { duration: 0.3, ease: 'power2.out' })
-    yTo.current = gsap.quickTo(mascotRef.current, 'rotateX', { duration: 0.3, ease: 'power2.out' })
+    if (!mascotRef.current || !tubeTrackRef.current) return
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2
-      const cy = window.innerHeight / 2
-      const dx = (e.clientX - cx) / cx
-      const dy = (e.clientY - cy) / cy
-      xTo.current?.(dx * 15)
-      yTo.current?.(-dy * 10)
-    }
+    // Parallax: mascot moves slower than background (0.6x speed)
+    const parallaxSpeed = 0.6
+    
+    const st = ScrollTrigger.create({
+      trigger: 'body',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      onUpdate: (self) => {
+        if (!mascotRef.current || !tubeTrackRef.current) return
+        const trackHeight = tubeTrackRef.current.clientHeight
+        const mascotHeight = mascotRef.current.clientHeight
+        const maxTravel = trackHeight - mascotHeight - 40 // 40px padding
+        const y = self.progress * maxTravel * parallaxSpeed // Slower movement
+        gsap.set(mascotRef.current, { y })
+      },
+    })
 
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    return () => st.kill()
   }, [])
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 px-4">
+    <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden pt-20 px-4">
       {/* Film grain overlay */}
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
+      {/* Particle field behind mascot */}
+      <ParticleField count={45} className="z-20" />
+
       {/* Atmospheric glow blurs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange/8 rounded-full blur-[120px]" />
+      <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-orange/8 rounded-full blur-[120px]" />
       <div className="absolute top-10 right-20 w-48 h-48 bg-orange/5 rounded-full blur-[80px]" />
       <div className="absolute bottom-20 left-10 w-64 h-64 bg-orange/3 rounded-full blur-[100px]" />
 
@@ -141,9 +141,81 @@ export default function Hero() {
         />
       ))}
 
-      <div className="relative z-10 text-center max-w-7xl mx-auto w-full">
+      {/* ============ THE TUBE (fixed right side) ============ */}
+      <div
+        ref={tubeRef}
+        className="fixed right-[4%] top-0 h-screen z-30 pointer-events-none hidden lg:block"
+        style={{ width: '180px' }}
+      >
+        {/* Tube structure */}
+        <div className="absolute inset-0 flex justify-between">
+          {/* Left wall */}
+          <div
+            className="w-[3px] h-full"
+            style={{
+              background: 'linear-gradient(to bottom, transparent 2%, rgba(255, 107, 44, 0.4) 10%, rgba(255, 107, 44, 0.6) 50%, rgba(255, 107, 44, 0.4) 90%, transparent 98%)',
+              boxShadow: '0 0 12px rgba(255, 107, 44, 0.3), 0 0 30px rgba(255, 107, 44, 0.1)',
+            }}
+          />
+          {/* Right wall */}
+          <div
+            className="w-[3px] h-full"
+            style={{
+              background: 'linear-gradient(to bottom, transparent 2%, rgba(255, 107, 44, 0.4) 10%, rgba(255, 107, 44, 0.6) 50%, rgba(255, 107, 44, 0.4) 90%, transparent 98%)',
+              boxShadow: '0 0 12px rgba(255, 107, 44, 0.3), 0 0 30px rgba(255, 107, 44, 0.1)',
+            }}
+          />
+        </div>
+
+        {/* Tube inner glow */}
+        <div
+          className="absolute inset-x-[3px] inset-y-0"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 5%, rgba(255, 107, 44, 0.03) 20%, rgba(255, 107, 44, 0.05) 50%, rgba(255, 107, 44, 0.03) 80%, transparent 95%)',
+          }}
+        />
+
+        {/* Horizontal light bars (like elevator markers) */}
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute left-0 right-0 h-[1px]"
+            style={{
+              top: `${12.5 * (i + 1)}%`,
+              background: 'linear-gradient(to right, rgba(255,107,44,0.3) 0%, rgba(255,107,44,0.08) 30%, rgba(255,107,44,0.08) 70%, rgba(255,107,44,0.3) 100%)',
+            }}
+          />
+        ))}
+
+        {/* Green status dots along the tube (like Shieldeum) */}
+        <div className="absolute right-[-20px] top-[15%] w-2.5 h-2.5 rounded-full bg-orange/80 shadow-[0_0_8px_rgba(255,107,44,0.6)]" />
+        <div className="absolute right-[-20px] top-[35%] w-2.5 h-2.5 rounded-full bg-orange/80 shadow-[0_0_8px_rgba(255,107,44,0.6)]" />
+        <div className="absolute right-[-20px] top-[55%] w-2.5 h-2.5 rounded-full bg-orange/60 shadow-[0_0_8px_rgba(255,107,44,0.4)]" />
+        <div className="absolute right-[-20px] top-[75%] w-2.5 h-2.5 rounded-full bg-orange/60 shadow-[0_0_8px_rgba(255,107,44,0.4)]" />
+
+        {/* Mascot track area */}
+        <div ref={tubeTrackRef} className="absolute inset-x-[6px] top-[8%] bottom-[8%]">
+          {/* The mascot inside the tube */}
+          <div
+            ref={mascotRef}
+            className="w-full aspect-square relative"
+            style={{
+              filter: 'drop-shadow(0 10px 30px rgba(255, 107, 44, 0.4))',
+            }}
+          >
+            <img
+              src="/mascot-hero-v3-clean.png"
+              alt="AgenticMonkey Mascot"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ============ MAIN CONTENT (left-aligned) ============ */}
+      <div className="relative z-10 max-w-5xl mx-auto w-full lg:pr-[220px]">
         {/* AGENTIC */}
-        <div className="agentic-text">
+        <div className="agentic-text text-center lg:text-left">
           <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
             <SplitText
               text="AGENTIC"
@@ -153,29 +225,8 @@ export default function Hero() {
           </h1>
         </div>
 
-        {/* Mascot */}
-        <div className="relative z-20 -my-4 md:-my-12" style={{ perspective: 1000 }}>
-          {/* Pulsing glow behind mascot */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="mascot-hero-glow animate-glow-pulse" />
-          </div>
-          <div className="animate-float">
-            <div
-              ref={mascotRef}
-              className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] relative z-10"
-              style={{
-                willChange: 'transform',
-                filter: 'drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35))',
-              }}
-            >
-              <Mascot3D />
-            </div>
-          </div>
-          <div className="mascot-pedestal" />
-        </div>
-
         {/* MONKEY */}
-        <div className="monkey-text -mt-2">
+        <div className="monkey-text text-center lg:text-left">
           <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
             <SplitText
               text="MONKEY"
@@ -186,12 +237,12 @@ export default function Hero() {
         </div>
 
         {/* Subtitle */}
-        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
+        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase text-center lg:text-left">
           Engineers of Autonomy
         </p>
 
         {/* CTA buttons */}
-        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
+        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start">
           <a
             href={BOOKING_URL}
             target="_blank"
@@ -206,6 +257,13 @@ export default function Hero() {
           >
             See Our Work
           </a>
+        </div>
+
+        {/* Mobile mascot (no tube on small screens) */}
+        <div className="lg:hidden mt-12 flex justify-center">
+          <div className="w-56 h-56 md:w-72 md:h-72">
+            <img src="/mascot-hero-v3-clean.png" alt="AgenticMonkey Mascot" className="w-full h-full object-contain drop-shadow-[0_20px_60px_rgba(255,107,44,0.35)]" />
+          </div>
         </div>
       </div>
 
