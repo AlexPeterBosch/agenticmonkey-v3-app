@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -27,8 +27,6 @@ function SplitText({ text, className, id }: { text: string; className?: string; 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
   const mascotRef = useRef<HTMLDivElement>(null)
-  const tubeRef = useRef<HTMLDivElement>(null)
-  const tubeTrackRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
@@ -49,12 +47,6 @@ export default function Hero() {
       duration: 1.2,
       ease: 'back.out(2)',
     }, '-=0.5')
-
-    // Tube lights up
-    tl.from(tubeRef.current, {
-      opacity: 0,
-      duration: 0.8,
-    }, '-=0.8')
 
     // MONKEY chars stagger in
     tl.from('.monkey-char', {
@@ -87,31 +79,6 @@ export default function Hero() {
 
   }, { scope: heroRef })
 
-  // Mascot rides down the tube on scroll with parallax depth effect
-  useEffect(() => {
-    if (!mascotRef.current || !tubeTrackRef.current) return
-
-    // Parallax: mascot moves slower than background (0.6x speed)
-    const parallaxSpeed = 0.6
-    
-    const st = ScrollTrigger.create({
-      trigger: 'body',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1,
-      onUpdate: (self) => {
-        if (!mascotRef.current || !tubeTrackRef.current) return
-        const trackHeight = tubeTrackRef.current.clientHeight
-        const mascotHeight = mascotRef.current.clientHeight
-        const maxTravel = trackHeight - mascotHeight - 40 // 40px padding
-        const y = self.progress * maxTravel * parallaxSpeed // Slower movement
-        gsap.set(mascotRef.current, { y })
-      },
-    })
-
-    return () => st.kill()
-  }, [])
-
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden pt-20 px-4">
       {/* Film grain overlay */}
@@ -142,122 +109,85 @@ export default function Hero() {
         />
       ))}
 
-      {/* ============ THE TUBE (fixed right side) ============ */}
-      <div
-        ref={tubeRef}
-        className="fixed right-[4%] top-0 h-screen z-30 pointer-events-none hidden lg:block"
-        style={{ width: '180px' }}
-      >
-        {/* Tube structure */}
-        <div className="absolute inset-0 flex justify-between">
-          {/* Left wall */}
-          <div
-            className="w-[3px] h-full"
-            style={{
-              background: 'linear-gradient(to bottom, transparent 2%, rgba(255, 107, 44, 0.4) 10%, rgba(255, 107, 44, 0.6) 50%, rgba(255, 107, 44, 0.4) 90%, transparent 98%)',
-              boxShadow: '0 0 12px rgba(255, 107, 44, 0.3), 0 0 30px rgba(255, 107, 44, 0.1)',
-            }}
-          />
-          {/* Right wall */}
-          <div
-            className="w-[3px] h-full"
-            style={{
-              background: 'linear-gradient(to bottom, transparent 2%, rgba(255, 107, 44, 0.4) 10%, rgba(255, 107, 44, 0.6) 50%, rgba(255, 107, 44, 0.4) 90%, transparent 98%)',
-              boxShadow: '0 0 12px rgba(255, 107, 44, 0.3), 0 0 30px rgba(255, 107, 44, 0.1)',
-            }}
-          />
-        </div>
-
-        {/* Tube inner glow */}
-        <div
-          className="absolute inset-x-[3px] inset-y-0"
-          style={{
-            background: 'linear-gradient(to bottom, transparent 5%, rgba(255, 107, 44, 0.03) 20%, rgba(255, 107, 44, 0.05) 50%, rgba(255, 107, 44, 0.03) 80%, transparent 95%)',
-          }}
-        />
-
-        {/* Horizontal light bars (like elevator markers) */}
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute left-0 right-0 h-[1px]"
-            style={{
-              top: `${12.5 * (i + 1)}%`,
-              background: 'linear-gradient(to right, rgba(255,107,44,0.3) 0%, rgba(255,107,44,0.08) 30%, rgba(255,107,44,0.08) 70%, rgba(255,107,44,0.3) 100%)',
-            }}
-          />
-        ))}
-
-        {/* Green status dots along the tube (like Shieldeum) */}
-        <div className="absolute right-[-20px] top-[15%] w-2.5 h-2.5 rounded-full bg-orange/80 shadow-[0_0_8px_rgba(255,107,44,0.6)]" />
-        <div className="absolute right-[-20px] top-[35%] w-2.5 h-2.5 rounded-full bg-orange/80 shadow-[0_0_8px_rgba(255,107,44,0.6)]" />
-        <div className="absolute right-[-20px] top-[55%] w-2.5 h-2.5 rounded-full bg-orange/60 shadow-[0_0_8px_rgba(255,107,44,0.4)]" />
-        <div className="absolute right-[-20px] top-[75%] w-2.5 h-2.5 rounded-full bg-orange/60 shadow-[0_0_8px_rgba(255,107,44,0.4)]" />
-
-        {/* Mascot track area */}
-        <div ref={tubeTrackRef} className="absolute inset-x-[6px] top-[8%] bottom-[8%]">
-          {/* The mascot inside the tube */}
-          <div
-            ref={mascotRef}
-            className="w-full aspect-square relative"
-          >
-            <AnimatedMascot className="w-full h-full" />
+      {/* ============ TWO-COLUMN LAYOUT ============ */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+          
+          {/* LEFT COLUMN - BIG MASCOT */}
+          <div className="w-full lg:w-[45%] order-1 lg:order-1">
+            <div
+              ref={mascotRef}
+              className="w-full h-[400px] md:h-[500px] lg:h-[600px] relative"
+            >
+              <AnimatedMascot className="w-full h-full" />
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* ============ MAIN CONTENT (left-aligned) ============ */}
-      <div className="relative z-10 max-w-5xl mx-auto w-full lg:pr-[220px]">
-        {/* AGENTIC */}
-        <div className="agentic-text text-center lg:text-left">
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
-            <SplitText
-              text="AGENTIC"
-              id="agentic"
-              className="text-[clamp(3rem,12vw,10rem)] text-white"
-            />
-          </h1>
-        </div>
+          {/* RIGHT COLUMN - TEXT CONTENT */}
+          <div className="w-full lg:w-[55%] order-2 lg:order-2 text-center lg:text-left">
+            {/* AGENTIC */}
+            <div className="agentic-text">
+              <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
+                <SplitText
+                  text="AGENTIC"
+                  id="agentic"
+                  className="text-[clamp(2.5rem,10vw,7rem)] text-white"
+                />
+              </h1>
+            </div>
 
-        {/* MONKEY */}
-        <div className="monkey-text text-center lg:text-left">
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
-            <SplitText
-              text="MONKEY"
-              id="monkey"
-              className="text-[clamp(3.5rem,13vw,11rem)] gradient-text"
-            />
-          </h1>
-        </div>
+            {/* MONKEY */}
+            <div className="monkey-text">
+              <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
+                <SplitText
+                  text="MONKEY"
+                  id="monkey"
+                  className="text-[clamp(3rem,11vw,8rem)] gradient-text"
+                />
+              </h1>
+            </div>
 
-        {/* Subtitle */}
-        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase text-center lg:text-left">
-          Engineers of Autonomy
-        </p>
+            {/* Subtitle */}
+            <p className="hero-subtitle mt-6 text-base md:text-xl lg:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
+              WE DON'T JUST BUILD AI.<br />
+              WE ENGINEER AUTONOMY.
+            </p>
 
-        {/* CTA buttons */}
-        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start">
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
-          >
-            Book a Consultation
-          </a>
-          <a
-            href="#services"
-            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
-          >
-            See Our Work
-          </a>
-        </div>
+            {/* Stats */}
+            <div className="mt-8 grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0">
+              <div className="text-center lg:text-left">
+                <div className="text-2xl md:text-3xl font-bold text-orange">50+</div>
+                <div className="text-xs md:text-sm text-white/60 uppercase tracking-wider mt-1">Agents</div>
+              </div>
+              <div className="text-center lg:text-left">
+                <div className="text-2xl md:text-3xl font-bold text-orange">10x</div>
+                <div className="text-xs md:text-sm text-white/60 uppercase tracking-wider mt-1">Efficiency</div>
+              </div>
+              <div className="text-center lg:text-left">
+                <div className="text-2xl md:text-3xl font-bold text-orange">24/7</div>
+                <div className="text-xs md:text-sm text-white/60 uppercase tracking-wider mt-1">Operation</div>
+              </div>
+            </div>
 
-        {/* Mobile mascot (no tube on small screens) */}
-        <div className="lg:hidden mt-12 flex justify-center">
-          <div className="w-56 h-56 md:w-72 md:h-72">
-            <AnimatedMascot className="w-full h-full" />
+            {/* CTA buttons */}
+            <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start">
+              <a
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
+              >
+                Book a Consultation
+              </a>
+              <a
+                href="#services"
+                className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
+              >
+                See Our Work
+              </a>
+            </div>
           </div>
+
         </div>
       </div>
 
