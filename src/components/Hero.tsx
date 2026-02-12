@@ -1,8 +1,7 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Mascot3D from './Mascot3D'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -10,11 +9,11 @@ const BOOKING_URL = 'https://cal.com/alex-bosch-nodozz/30min'
 
 function SplitText({ text, className, id }: { text: string; className?: string; id: string }) {
   return (
-    <span className={`inline-block overflow-hidden ${className || ''}`}>
+    <span className="inline-block overflow-hidden">
       {text.split('').map((char, i) => (
         <span
           key={i}
-          className={`${id}-char inline-block`}
+          className={`${id}-char inline-block ${className || ''}`}
           style={{ display: 'inline-block' }}
         >
           {char === ' ' ? '\u00A0' : char}
@@ -26,57 +25,97 @@ function SplitText({ text, className, id }: { text: string; className?: string; 
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
-  const mascotRef = useRef<HTMLDivElement>(null)
-  const xTo = useRef<gsap.QuickToFunc | null>(null)
-  const yTo = useRef<gsap.QuickToFunc | null>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const welcomeRef = useRef<HTMLSpanElement>(null)
+  const countRef = useRef<HTMLSpanElement>(null)
+  const agenticRef = useRef<HTMLDivElement>(null)
+  const monkeyBlockRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // AGENTIC chars stagger in
-    tl.from('.agentic-char', {
-      y: 100,
+    // Step 1: Welcome Flash (0s - 0.8s)
+    tl.to(welcomeRef.current, {
+      opacity: 1,
+      duration: 0.15,
+    })
+    .to(welcomeRef.current, {
       opacity: 0,
-      duration: 0.8,
-      stagger: 0.05,
+      duration: 0.15,
+      delay: 0.5,
     })
 
-    // Mascot scale in
-    tl.from(mascotRef.current, {
-      scale: 0.8,
+    // Step 2: "2" flash (0.8s - 1.3s)
+    tl.to(countRef.current, {
+      opacity: 1,
+      duration: 0.1,
+    })
+    .to(countRef.current, {
       opacity: 0,
+      duration: 0.1,
+      delay: 0.3,
+    })
+
+    // Fade out the overlay
+    tl.to(overlayRef.current, {
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => {
+        if (overlayRef.current) {
+          overlayRef.current.style.display = 'none'
+        }
+      },
+    })
+
+    // Step 3: "AGENTIC" slides DOWN from top (1.3s - 2.3s)
+    tl.to(agenticRef.current, {
+      y: 0,
       duration: 1,
-      ease: 'back.out(1.7)',
-    }, '-=0.5')
+      ease: 'power3.out',
+    }, '1.3')
 
-    // MONKEY chars stagger in
-    tl.from('.monkey-char', {
-      y: 100,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.05,
-    }, '-=0.5')
+    // Step 4: "MONKEY" + subtitle + CTAs rise UP from bottom (2.0s - 3.0s)
+    tl.to(monkeyBlockRef.current, {
+      y: 0,
+      duration: 1,
+      ease: 'power3.out',
+    }, '2.0')
 
-    // Subtitle
-    tl.from('.hero-subtitle', {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-    }, '-=0.3')
-
-    // CTA
-    tl.from('.hero-cta', {
-      scale: 0,
-      opacity: 0,
+    // Step 5: BOUNCE impact (3.0s - 3.5s)
+    tl.to('.monkey-text', {
+      y: -20,
+      scaleY: 0.9,
+      scaleX: 1.05,
+      duration: 0.25,
+      ease: 'power2.in',
+    }, '3.0')
+    .to('.monkey-text', {
+      y: 0,
+      scaleY: 1,
+      scaleX: 1,
       duration: 0.5,
-      ease: 'back.out(2)',
-    }, '-=0.2')
+      ease: 'bounce.out',
+    })
+
+    // Step 6: Subtitle + CTA fade in (3.2s - 3.8s)
+    tl.from('.hero-subtitle', {
+      opacity: 0,
+      y: 20,
+      duration: 0.4,
+      ease: 'power2.out',
+    }, '3.2')
+    .from('.hero-cta', {
+      opacity: 0,
+      y: 20,
+      duration: 0.4,
+      ease: 'power2.out',
+    }, '3.3')
 
     // Scroll indicator
     tl.from('.scroll-indicator', {
       opacity: 0,
       duration: 0.5,
-    })
+    }, '3.5')
 
     // Parallax on scroll
     ScrollTrigger.create({
@@ -88,34 +127,24 @@ export default function Hero() {
         const p = self.progress
         gsap.set('.agentic-text', { y: p * -80 })
         gsap.set('.monkey-text', { y: p * -60 })
-        gsap.set(mascotRef.current, { y: p * -200 })
         gsap.set('.hero-subtitle', { y: p * -40 })
         gsap.set('.hero-cta', { y: p * -30 })
       },
     })
   }, { scope: heroRef })
 
-  // Mouse follow tilt
-  useEffect(() => {
-    if (!mascotRef.current) return
-    xTo.current = gsap.quickTo(mascotRef.current, 'rotateY', { duration: 0.3, ease: 'power2.out' })
-    yTo.current = gsap.quickTo(mascotRef.current, 'rotateX', { duration: 0.3, ease: 'power2.out' })
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2
-      const cy = window.innerHeight / 2
-      const dx = (e.clientX - cx) / cx
-      const dy = (e.clientY - cy) / cy
-      xTo.current?.(dx * 15)
-      yTo.current?.(-dy * 10)
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
-
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 px-4">
+    <section ref={heroRef} className="relative min-h-screen overflow-hidden">
+      {/* Intro overlay */}
+      <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
+        <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-6xl md:text-8xl font-bold uppercase opacity-0">
+          WELCOME
+        </span>
+        <span ref={countRef} className="text-white font-[var(--font-display)] text-6xl md:text-8xl font-bold absolute opacity-0">
+          2
+        </span>
+      </div>
+
       {/* Film grain overlay */}
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
@@ -141,71 +170,62 @@ export default function Hero() {
         />
       ))}
 
-      <div className="relative z-10 text-center max-w-7xl mx-auto w-full">
-        {/* AGENTIC */}
-        <div className="agentic-text">
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4">
+        {/* AGENTIC - slides from top */}
+        <div 
+          ref={agenticRef} 
+          className="agentic-text"
+          style={{ transform: 'translateY(-100vh)', willChange: 'transform' }}
+        >
+          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter text-[clamp(3rem,12vw,10rem)] text-white">
             <SplitText
               text="AGENTIC"
               id="agentic"
-              className="text-[clamp(3rem,12vw,10rem)] text-white"
             />
           </h1>
         </div>
-
-        {/* Mascot */}
-        <div className="relative z-20 -my-4 md:-my-12" style={{ perspective: 1000 }}>
-          {/* Pulsing glow behind mascot */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="mascot-hero-glow animate-glow-pulse" />
+        
+        {/* Space for mascot (Phase 2) */}
+        <div className="h-16 md:h-24" />
+        
+        {/* MONKEY + subtitle + CTA - rises from bottom */}
+        <div 
+          ref={monkeyBlockRef}
+          style={{ transform: 'translateY(100vh)', willChange: 'transform' }}
+        >
+          <div className="monkey-text" style={{ willChange: 'transform' }}>
+            <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter text-[clamp(3.5rem,13vw,11rem)]">
+              <SplitText
+                text="MONKEY"
+                id="monkey"
+                className="gradient-text"
+              />
+            </h1>
           </div>
-          <div className="animate-float">
-            <div
-              ref={mascotRef}
-              className="mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] relative z-10"
-              style={{
-                willChange: 'transform',
-                filter: 'drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35))',
-              }}
+
+          {/* Subtitle */}
+          <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
+            Engineers of Autonomy
+          </p>
+
+          {/* CTA buttons */}
+          <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <a
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
             >
-              <Mascot3D />
-            </div>
+              Book a Consultation
+            </a>
+            <a
+              href="#services"
+              className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
+            >
+              See Our Work
+            </a>
           </div>
-          <div className="mascot-pedestal" />
-        </div>
-
-        {/* MONKEY */}
-        <div className="monkey-text -mt-2">
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
-            <SplitText
-              text="MONKEY"
-              id="monkey"
-              className="text-[clamp(3.5rem,13vw,11rem)] gradient-text"
-            />
-          </h1>
-        </div>
-
-        {/* Subtitle */}
-        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
-          Engineers of Autonomy
-        </p>
-
-        {/* CTA buttons */}
-        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
-          >
-            Book a Consultation
-          </a>
-          <a
-            href="#services"
-            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
-          >
-            See Our Work
-          </a>
         </div>
       </div>
 
