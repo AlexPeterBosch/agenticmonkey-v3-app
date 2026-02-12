@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ParticleField from './ParticleField'
+import AnimatedMascot from './AnimatedMascot'
 gsap.registerPlugin(ScrollTrigger)
 
 const BOOKING_URL = 'https://cal.com/alex-bosch-nodozz/30min'
@@ -199,15 +200,8 @@ export default function Hero() {
           <div
             ref={mascotRef}
             className="w-full aspect-square relative"
-            style={{
-              filter: 'drop-shadow(0 10px 30px rgba(255, 107, 44, 0.4))',
-            }}
           >
-            <img
-              src="/mascot-hero-v3-clean.png"
-              alt="AgenticMonkey Mascot"
-              className="w-full h-full object-contain"
-            />
+            <AnimatedMascot className="w-full h-full" />
           </div>
         </div>
       </div>
@@ -262,7 +256,7 @@ export default function Hero() {
         {/* Mobile mascot (no tube on small screens) */}
         <div className="lg:hidden mt-12 flex justify-center">
           <div className="w-56 h-56 md:w-72 md:h-72">
-            <img src="/mascot-hero-v3-clean.png" alt="AgenticMonkey Mascot" className="w-full h-full object-contain drop-shadow-[0_20px_60px_rgba(255,107,44,0.35)]" />
+            <AnimatedMascot className="w-full h-full" />
           </div>
         </div>
       </div>
