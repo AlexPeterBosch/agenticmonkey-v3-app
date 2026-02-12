@@ -1,4 +1,6 @@
-import { useRef } from 'react'
+import { useRef, lazy, Suspense } from 'react'
+
+const MascotLottie = lazy(() => import('./MascotLottie'))
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -203,8 +205,12 @@ export default function Hero() {
           </h1>
         </div>
         
-        {/* Space for mascot video (Phase 2) */}
-        <div className="h-32 md:h-48 lg:h-64" />
+        {/* Mascot Lottie Animation */}
+        <div className="h-48 md:h-64 lg:h-80 flex items-center justify-center">
+          <Suspense fallback={null}>
+            <MascotLottie className="h-full w-auto" />
+          </Suspense>
+        </div>
         
         {/* MONKEY + subtitle + CTA - rises from bottom */}
         <div 
