@@ -1,138 +1,326 @@
 import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(ScrollTrigger)
-
-interface Props {
+interface AnimatedMascotProps {
   className?: string
 }
 
-export default function AnimatedMascot({ className = '' }: Props) {
+export default function AnimatedMascot({ className = '' }: AnimatedMascotProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
-  const eyeLeftRef = useRef<HTMLDivElement>(null)
-  const eyeRightRef = useRef<HTMLDivElement>(null)
+  const leftEyeRef = useRef<HTMLDivElement>(null)
+  const rightEyeRef = useRef<HTMLDivElement>(null)
   const chestGlowRef = useRef<HTMLDivElement>(null)
   const platformGlowRef = useRef<HTMLDivElement>(null)
 
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const springConfig = { damping: 25, stiffness: 120, mass: 0.5 }
-  const smoothX = useSpring(mouseX, springConfig)
-  const smoothY = useSpring(mouseY, springConfig)
-  const rotateX = useTransform(smoothY, [-200, 200], [8, -8])
-  const rotateY = useTransform(smoothX, [-200, 200], [-8, 8])
-  const translateX = useTransform(smoothX, [-200, 200], [-10, 10])
-  const translateY = useTransform(smoothY, [-200, 200], [-10, 10])
-
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    if (!imageRef.current || !leftEyeRef.current || !rightEyeRef.current || !chestGlowRef.current || !platformGlowRef.current) return
 
-    // Scroll entrance
-    gsap.fromTo(container, 
-      { scale: 0.5, opacity: 0, y: 60 },
-      { scale: 1, opacity: 1, y: 0, duration: 1.2, ease: 'back.out(1.7)',
-        scrollTrigger: { trigger: container, start: 'top 85%', once: true }
-      }
-    )
+    const image = imageRef.current
+    const leftEye = leftEyeRef.current
+    const rightEye = rightEyeRef.current
+    const chestGlow = chestGlowRef.current
+    const platformGlow = platformGlowRef.current
 
-    // Floating/bobbing on the image
-    if (imageRef.current) {
-      gsap.to(imageRef.current, {
-        y: -8, duration: 2.5, yoyo: true, repeat: -1, ease: 'sine.inOut'
-      })
-    }
+    // ===== FLOATING/BOBBING =====
+    gsap.to(image, {
+      y: -8,
+      duration: 2.5,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    })
 
-    // Eye blink (random interval 3-6s)
+    // ===== EYE BLINK =====
     const blinkEyes = () => {
-      const delay = 3 + Math.random() * 3
-      gsap.timeline({ delay })
-        .to([eyeLeftRef.current, eyeRightRef.current], {
-          scaleY: 0.1, duration: 0.08, ease: 'power2.in'
-        })
-        .to([eyeLeftRef.current, eyeRightRef.current], {
-          scaleY: 1, duration: 0.12, ease: 'power2.out', onComplete: blinkEyes
-        })
+      const tl = gsap.timeline()
+      tl.to([leftEye, rightEye], {
+        scaleY: 0,
+        duration: 0.08,
+        ease: 'power2.in',
+      })
+      tl.to([leftEye, rightEye], {
+        scaleY: 1,
+        duration: 0.08,
+        ease: 'power2.out',
+      })
+      gsap.delayedCall(gsap.utils.random(3, 5), blinkEyes)
     }
-    blinkEyes()
+    gsap.delayedCall(gsap.utils.random(2, 4), blinkEyes)
 
-    // Chest emblem glow pulse
-    if (chestGlowRef.current) {
-      gsap.to(chestGlowRef.current, {
-        opacity: 0.9, scale: 1.2, duration: 2, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    // ===== CHEST EMBLEM GLOW PULSE =====
+    gsap.to(chestGlow, {
+      opacity: 0.8,
+      scale: 1.05,
+      duration: 2,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    })
+
+    // ===== PLATFORM GLOW BREATHING =====
+    gsap.to(platformGlow, {
+      opacity: 0.9,
+      scale: 1.1,
+      duration: 2.5,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    })
+
+    // ===== MOUSE PARALLAX =====
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return
+
+      const rect = containerRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      const deltaX = (e.clientX - centerX) / rect.width
+      const deltaY = (e.clientY - centerY) / rect.height
+
+      gsap.to(image, {
+        x: deltaX * 15,
+        y: deltaY * 10 - 8, // Keep the floating offset
+        rotationY: deltaX * 10,
+        rotationX: -deltaY * 10,
+        duration: 0.5,
+        ease: 'power2.out',
       })
     }
 
-    // Platform glow breathing
-    if (platformGlowRef.current) {
-      gsap.to(platformGlowRef.current, {
-        opacity: 0.8, scaleX: 1.15, duration: 2.5, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    // ===== HOVER: SCALE UP + ENHANCED GLOW =====
+    const handleMouseEnter = () => {
+      gsap.to(image, {
+        scale: 1.05,
+        duration: 0.3,
+        ease: 'back.out(1.7)',
       })
+      gsap.to(chestGlow, {
+        opacity: 1,
+        scale: 1.2,
+        duration: 0.3,
+      })
+      gsap.to(platformGlow, {
+        opacity: 1,
+        scale: 1.3,
+        duration: 0.3,
+      })
+    }
+
+    const handleMouseLeave = () => {
+      gsap.to(image, {
+        scale: 1,
+        x: 0,
+        y: 0,
+        rotationY: 0,
+        rotationX: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+      })
+      gsap.to(chestGlow, {
+        opacity: 0.4,
+        scale: 1,
+        duration: 0.5,
+      })
+      gsap.to(platformGlow, {
+        opacity: 0.6,
+        scale: 1,
+        duration: 0.5,
+      })
+    }
+
+    // ===== CLICK: BOUNCE =====
+    const handleClick = () => {
+      const tl = gsap.timeline()
+      tl.to(image, {
+        y: -20,
+        duration: 0.2,
+        ease: 'power2.out',
+      })
+      tl.to(image, {
+        y: 0,
+        duration: 0.4,
+        ease: 'bounce.out',
+      })
+    }
+
+    // Event listeners
+    window.addEventListener('mousemove', handleMouseMove)
+    if (containerRef.current) {
+      containerRef.current.addEventListener('mouseenter', handleMouseEnter)
+      containerRef.current.addEventListener('mouseleave', handleMouseLeave)
+      containerRef.current.addEventListener('click', handleClick)
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('mouseenter', handleMouseEnter)
+        containerRef.current.removeEventListener('mouseleave', handleMouseLeave)
+        containerRef.current.removeEventListener('click', handleClick)
+      }
+      gsap.killTweensOf([image, leftEye, rightEye, chestGlow, platformGlow])
     }
   }, [])
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect) return
-    mouseX.set(e.clientX - rect.left - rect.width / 2)
-    mouseY.set(e.clientY - rect.top - rect.height / 2)
-  }
-
-  const handleMouseLeave = () => { mouseX.set(0); mouseY.set(0) }
-
-  const handleClick = () => {
-    if (imageRef.current) {
-      gsap.timeline()
-        .to(imageRef.current, { y: -25, duration: 0.2, ease: 'power2.out' })
-        .to(imageRef.current, { y: 0, duration: 0.6, ease: 'bounce.out' })
-    }
-  }
 
   return (
     <div
       ref={containerRef}
-      className={`relative ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
-      style={{ perspective: 1000, cursor: 'pointer' }}
+      className={`${className} relative cursor-pointer`}
+      style={{
+        perspective: '1000px',
+      }}
     >
-      {/* Platform glow */}
-      <div ref={platformGlowRef} className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[60%] h-[8%] rounded-full opacity-50" 
-        style={{ background: 'radial-gradient(ellipse, rgba(255,107,44,0.6) 0%, transparent 70%)', filter: 'blur(8px)', willChange: 'transform, opacity' }} />
-
-      {/* Main mascot image with parallax */}
-      <motion.img
+      {/* The actual mascot PNG */}
+      <img
         ref={imageRef}
         src="/mascot-hero-v3.png"
         alt="AgenticMonkey Mascot"
-        className="relative z-10 w-full h-full object-contain"
-        style={{ rotateX, rotateY, x: translateX, y: translateY, willChange: 'transform',
-          filter: 'drop-shadow(0 10px 30px rgba(255,107,44,0.3))' }}
+        className="w-full h-full object-contain"
+        style={{
+          willChange: 'transform',
+          filter: 'drop-shadow(0 0 30px rgba(255, 107, 44, 0.3))',
+        }}
       />
 
-      {/* Eye glow overlays - positioned over the eyes */}
-      <div ref={eyeLeftRef} className="absolute z-20 pointer-events-none"
-        style={{ top: '28%', left: '36%', width: '8%', height: '6%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0) 70%)',
-          filter: 'blur(2px)', willChange: 'transform' }} />
-      <div ref={eyeRightRef} className="absolute z-20 pointer-events-none"
-        style={{ top: '28%', right: '33%', width: '8%', height: '6%',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0) 70%)',
-          filter: 'blur(2px)', willChange: 'transform' }} />
+      {/* === OVERLAY: LEFT EYE GLOW === */}
+      <div
+        ref={leftEyeRef}
+        className="absolute pointer-events-none"
+        style={{
+          top: '17%',
+          left: '33%',
+          width: '10%',
+          height: '7%',
+          willChange: 'transform',
+        }}
+      >
+        {/* Star shape glow */}
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <radialGradient id="eye-glow-left">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {/* Four-pointed star */}
+          <path
+            d="M 50 10 L 55 45 L 90 50 L 55 55 L 50 90 L 45 55 L 10 50 L 45 45 Z"
+            fill="url(#eye-glow-left)"
+            filter="blur(2px)"
+          />
+        </svg>
+      </div>
 
-      {/* Chest emblem glow */}
-      <div ref={chestGlowRef} className="absolute z-20 pointer-events-none"
-        style={{ top: '52%', left: '50%', transform: 'translate(-50%, -50%)', width: '15%', height: '10%',
-          background: 'radial-gradient(circle, rgba(255,107,44,0.7) 0%, transparent 70%)',
-          filter: 'blur(6px)', opacity: 0.4, willChange: 'transform, opacity' }} />
+      {/* === OVERLAY: RIGHT EYE GLOW === */}
+      <div
+        ref={rightEyeRef}
+        className="absolute pointer-events-none"
+        style={{
+          top: '17%',
+          left: '57%',
+          width: '10%',
+          height: '7%',
+          willChange: 'transform',
+        }}
+      >
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <radialGradient id="eye-glow-right">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+              <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <path
+            d="M 50 10 L 55 45 L 90 50 L 55 55 L 50 90 L 45 55 L 10 50 L 45 45 Z"
+            fill="url(#eye-glow-right)"
+            filter="blur(2px)"
+          />
+        </svg>
+      </div>
 
-      {/* Ambient glow behind mascot */}
-      <div className="absolute inset-0 z-0 pointer-events-none"
-        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,107,44,0.08) 0%, transparent 60%)' }} />
+      {/* === OVERLAY: CHEST EMBLEM GLOW === */}
+      <div
+        ref={chestGlowRef}
+        className="absolute pointer-events-none"
+        style={{
+          top: '43%',
+          left: '40%',
+          width: '20%',
+          height: '15%',
+          opacity: 0.4,
+          willChange: 'transform, opacity',
+        }}
+      >
+        <div
+          className="w-full h-full rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255, 107, 44, 0.8) 0%, rgba(255, 107, 44, 0.4) 40%, transparent 70%)',
+            filter: 'blur(8px)',
+          }}
+        />
+      </div>
+
+      {/* === OVERLAY: PLATFORM GLOW === */}
+      <div
+        ref={platformGlowRef}
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '2%',
+          left: '20%',
+          width: '60%',
+          height: '12%',
+          opacity: 0.6,
+          willChange: 'transform, opacity',
+        }}
+      >
+        <div
+          className="w-full h-full rounded-full"
+          style={{
+            background: 'radial-gradient(ellipse, rgba(255, 107, 44, 0.9) 0%, rgba(255, 107, 44, 0.5) 40%, transparent 70%)',
+            filter: 'blur(12px)',
+          }}
+        />
+      </div>
+
+      {/* === FLOATING PARTICLES === */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: `${2 + Math.random() * 3}px`,
+            height: `${2 + Math.random() * 3}px`,
+            top: `${20 + Math.random() * 60}%`,
+            left: `${10 + Math.random() * 80}%`,
+            background: '#FF6B2C',
+            opacity: 0.3 + Math.random() * 0.4,
+            boxShadow: '0 0 6px rgba(255, 107, 44, 0.6)',
+            animation: `float-particle ${3 + Math.random() * 4}s ease-in-out infinite`,
+            animationDelay: `${Math.random() * 3}s`,
+          }}
+        />
+      ))}
+
+      <style>{`
+        @keyframes float-particle {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+          }
+          25% {
+            transform: translateY(-10px) translateX(5px);
+          }
+          50% {
+            transform: translateY(-5px) translateX(-5px);
+          }
+          75% {
+            transform: translateY(-12px) translateX(3px);
+          }
+        }
+      `}</style>
     </div>
   )
 }
