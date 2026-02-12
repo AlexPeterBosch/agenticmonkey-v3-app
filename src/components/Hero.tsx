@@ -32,9 +32,12 @@ export default function Hero() {
   const monkeyBlockRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    // Hide navbar initially
+    gsap.set('nav', { opacity: 0, y: -20 })
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // Step 1: Welcome Flash (0s - 1.5s)
+    // Step 1: Welcome Flash (perfect — don't touch)
     tl.to(welcomeRef.current, {
       opacity: 1,
       duration: 0.3,
@@ -45,7 +48,7 @@ export default function Hero() {
       delay: 1.0,
     })
 
-    // Step 2: "TO" flash (1.6s - 2.8s)
+    // Step 2: "TO" flash (perfect — don't touch)
     tl.to(countRef.current, {
       opacity: 1,
       duration: 0.3,
@@ -67,19 +70,19 @@ export default function Hero() {
       },
     })
 
-    // Step 3: "AGENTIC" slides DOWN from top
+    // Step 3: "AGENTIC" slides DOWN from top — SLOW elevator (4x slower)
     tl.to(agenticRef.current, {
       y: 0,
-      duration: 1.2,
-      ease: 'power3.out',
+      duration: 4,
+      ease: 'power2.inOut',
     }, '-=0.1')
 
-    // Step 4: "MONKEY" + subtitle + CTAs rise UP from bottom
+    // Step 4: "MONKEY" rises UP — starts when AGENTIC is ~25% down (1s into its 4s journey)
     tl.to(monkeyBlockRef.current, {
       y: 0,
-      duration: 1.2,
-      ease: 'power3.out',
-    }, '<0.3')
+      duration: 3.5,
+      ease: 'power2.inOut',
+    }, '<1')
 
     // Step 5: BOUNCE impact when MONKEY arrives
     tl.to('.monkey-text', {
@@ -110,6 +113,14 @@ export default function Hero() {
       duration: 0.5,
       ease: 'power2.out',
     }, '<0.1')
+
+    // Step 7: Navbar fades in AFTER monkey bounce
+    tl.to('nav', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+    })
 
     // Scroll indicator
     tl.from('.scroll-indicator', {
