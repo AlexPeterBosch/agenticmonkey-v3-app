@@ -106,7 +106,7 @@ export default function CTASection() {
           </div>
 
           <div className="cta-mascot lg:col-span-2 flex justify-center lg:justify-end">
-            <img src="/mascot-hero-v3.png" alt="AgenticMonkey mascot" className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
+            <img src="/mascot-hero-v3.webp" alt="AgenticMonkey mascot" className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <img src="/mascot-hero-v3.png" alt="AgenticMonkey" className="w-10 h-10 object-contain" />
+              <img src="/mascot-hero-v3.webp" alt="AgenticMonkey" className="w-10 h-10 object-contain" />
               <span className="font-[var(--font-display)] font-bold text-xl">
                 AGENTIC<span className="text-orange">MONKEY</span>
               </span>
