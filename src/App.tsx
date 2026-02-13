@@ -6,7 +6,6 @@ import Hero from './components/Hero'
 import PartnersMarquee from './components/PartnersMarquee'
 import ProblemSolution from './components/ProblemSolution'
 import Services from './components/Services'
-import MascotShowcase from './components/MascotShowcase'
 import HowItWorks from './components/HowItWorks'
 import Industries from './components/Industries'
 import WhyChooseUs from './components/WhyChooseUs'
@@ -37,7 +36,6 @@ function App() {
         <PartnersMarquee />
         <ProblemSolution />
         <Services />
-        <MascotShowcase />
         <HowItWorks />
         <Industries />
         <WhyChooseUs />

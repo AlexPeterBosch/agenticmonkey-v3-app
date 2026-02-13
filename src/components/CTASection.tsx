@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import MascotInteractive from './MascotInteractive'
+// MascotInteractive removed
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -106,7 +106,7 @@ export default function CTASection() {
           </div>
 
           <div className="cta-mascot lg:col-span-2 flex justify-center lg:justify-end">
-            <MascotInteractive className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
+            <img src="/mascot-hero-v3.png" alt="AgenticMonkey mascot" className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
           </div>
         </div>
       </div>
