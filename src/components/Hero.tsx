@@ -453,9 +453,9 @@ export default function Hero() {
   }, { scope: heroRef })
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 bg-[#0A0A0A]">
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 bg-black">
       {/* Intro overlay */}
-      <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
+      <div ref={overlayRef} className="fixed inset-0 z-50 bg-black flex items-center justify-center pointer-events-none">
         <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
           WELCOME
         </span>
@@ -464,8 +464,6 @@ export default function Hero() {
         </span>
       </div>
 
-      {/* Ambient effects */}
-      <div className="hero-ambient" />
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
       {/* Floating particles */}

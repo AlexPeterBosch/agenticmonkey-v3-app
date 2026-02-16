@@ -3,7 +3,7 @@
 @theme {
   --color-primary: #000000;
   --color-dark: #000000;
-  --color-dark-surface: #0A0A0A;
+  --color-dark-surface: #000000;
   --color-cyan: #00D4FF;
   --color-cyan-dark: #00B8E0;
   --color-orange: #FF6B2C;
@@ -18,7 +18,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #050505;
+  background-color: #000000;
   color: #FFFFFF;
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
