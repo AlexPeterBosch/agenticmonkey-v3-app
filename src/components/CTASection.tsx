@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-// MascotInteractive removed
+import MascotInteractive from './MascotInteractive'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -16,12 +16,11 @@ export default function CTASection() {
     gsap.from('.cta-heading', {
       x: -100,
       opacity: 0,
-      duration: 1,
-      ease: 'power3.out',
       scrollTrigger: {
         trigger: '.cta-heading',
         start: 'top 85%',
-        toggleActions: 'play none none none',
+        end: 'top 50%',
+        scrub: true,
       },
     })
 
@@ -29,9 +28,6 @@ export default function CTASection() {
     gsap.from('.cta-text', {
       opacity: 0,
       y: 20,
-      duration: 0.8,
-      ease: 'power2.out',
-      delay: 0.2,
       scrollTrigger: {
         trigger: '.cta-text',
         start: 'top 85%',
@@ -42,9 +38,6 @@ export default function CTASection() {
     gsap.from('.cta-button', {
       opacity: 0,
       y: 20,
-      duration: 0.8,
-      ease: 'power2.out',
-      delay: 0.3,
       scrollTrigger: {
         trigger: '.cta-button',
         start: 'top 90%',
@@ -77,7 +70,7 @@ export default function CTASection() {
   }, { scope: sectionRef })
 
   return (
-    <section ref={sectionRef} className="relative py-20 md:py-28 overflow-hidden z-10 bg-black">
+    <section ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden z-10">
       <div className="absolute inset-0 bg-gradient-to-br from-orange/5 via-transparent to-orange/3" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -106,7 +99,7 @@ export default function CTASection() {
           </div>
 
           <div className="cta-mascot lg:col-span-2 flex justify-center lg:justify-end">
-            <img src="/mascot-hero-v3.webp" alt="AgenticMonkey mascot" className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
+            <MascotInteractive className="w-64 md:w-80 lg:w-96 drop-shadow-2xl" />
           </div>
         </div>
       </div>

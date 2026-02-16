@@ -18,12 +18,50 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000000;
+  background-color: #050505;
   color: #FFFFFF;
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* Ambient background glow */
+@keyframes ambient-shift {
+  0%, 100% { 
+    background-position: 0% 50%;
+    opacity: 0.4;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 0.6;
+  }
+}
+
+.hero-ambient {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% 120%, rgba(255, 107, 44, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 50%, rgba(255, 80, 20, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 30%, rgba(255, 140, 60, 0.05) 0%, transparent 50%);
+  animation: ambient-shift 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid lines */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 107, 44, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 107, 44, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  z-index: 0;
+  mask: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 80%);
+  -webkit-mask: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 80%);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -265,6 +303,140 @@ h1, h2, h3, h4, h5, h6 {
 .section-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255, 107, 44, 0.15), transparent);
+}
+
+/* ── Navbar premium animations ── */
+
+/* 1. Nav link underline slide-in */
+@keyframes nav-underline-glow {
+  0% { box-shadow: 0 0 4px rgba(255, 107, 44, 0.4); }
+  100% { box-shadow: 0 0 8px rgba(255, 107, 44, 0.6); }
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #FF6B2C, #FFAA70);
+  border-radius: 1px;
+  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 0 6px rgba(255, 107, 44, 0.5);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* 5 & 6. Nav link scale + background glow on hover */
+.nav-link:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 12px rgba(255, 107, 44, 0.3);
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: -4px -8px;
+  border-radius: 8px;
+  background: radial-gradient(ellipse, rgba(255, 107, 44, 0.12), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+}
+
+.nav-link:hover::before {
+  opacity: 1;
+}
+
+/* 2. Book a Call shimmer sweep */
+@keyframes btn-shimmer {
+  0% { left: -100%; }
+  20% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.nav-cta {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nav-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: btn-shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.nav-cta:hover {
+  box-shadow: 0 0 24px rgba(255, 107, 44, 0.5), 0 0 48px rgba(255, 107, 44, 0.2);
+}
+
+/* 3. Logo gradient shimmer */
+@keyframes logo-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.logo-shimmer {
+  background: linear-gradient(
+    90deg,
+    #FFFFFF 0%,
+    #FFFFFF 35%,
+    #FFAA70 50%,
+    #FFFFFF 65%,
+    #FFFFFF 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logo-shimmer 6s ease-in-out infinite;
+}
+
+.logo-shimmer-orange {
+  background: linear-gradient(
+    90deg,
+    #FF6B2C 0%,
+    #FF6B2C 35%,
+    #FFDD99 50%,
+    #FF6B2C 65%,
+    #FF6B2C 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logo-shimmer 6s ease-in-out infinite;
+}
+
+/* 4. Navbar container border glow pulse */
+@keyframes navbar-border-glow {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.1); }
+  50% { border-color: rgba(255, 107, 44, 0.2); }
+}
+
+.navbar-glass {
+  animation: navbar-border-glow 4s ease-in-out infinite;
 }
 
 /* Subtle noise texture for depth */

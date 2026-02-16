@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -27,12 +27,21 @@ export default function Hero() {
   const heroRef = useRef<HTMLElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const welcomeRef = useRef<HTMLSpanElement>(null)
-  const countRef = useRef<HTMLSpanElement>(null)
-  const agenticRef = useRef<HTMLDivElement>(null)
-  const monkeyBlockRef = useRef<HTMLDivElement>(null)
+  const toRef = useRef<HTMLSpanElement>(null)
+  const introVideoRef = useRef<HTMLVideoElement>(null)
+  const loopVideoRef = useRef<HTMLVideoElement>(null)
+  const [introEnded, setIntroEnded] = useState(false)
+
+  const handleIntroEnd = useCallback(() => {
+    setIntroEnded(true)
+    if (loopVideoRef.current) {
+      loopVideoRef.current.currentTime = 0
+      loopVideoRef.current.play()
+    }
+  }, [])
 
   useGSAP(() => {
-    // Hide navbar immediately — force it hidden even if it mounted late
+    // Hide navbar initially, fade in after 2.5s of video playing
     const navEl = document.querySelector('nav')
     if (navEl) {
       navEl.style.opacity = '0'
@@ -41,32 +50,50 @@ export default function Hero() {
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // Step 1: Welcome Flash (perfect — don't touch)
+    // Step 1: "WELCOME" flash — faster
     tl.to(welcomeRef.current, {
       opacity: 1,
       duration: 0.3,
     })
     .to(welcomeRef.current, {
       opacity: 0,
-      duration: 0.3,
-      delay: 1.0,
+      duration: 0.2,
+      delay: 0.6,
     })
 
-    // Step 2: "TO" flash (perfect — don't touch)
-    tl.to(countRef.current, {
+    // Step 2: "TO" flash — faster
+    tl.to(toRef.current, {
       opacity: 1,
       duration: 0.3,
     })
-    .to(countRef.current, {
+    .to(toRef.current, {
       opacity: 0,
-      duration: 0.3,
-      delay: 0.8,
+      duration: 0.2,
+      delay: 0.5,
     })
 
-    // Fade out the overlay — immediate, no dead pause
+    // Fade out overlay — start video + text immediately
     tl.to(overlayRef.current, {
       opacity: 0,
-      duration: 0.5,
+      duration: 0.3,
+      onStart: () => {
+        if (introVideoRef.current) {
+          introVideoRef.current.currentTime = 0
+          introVideoRef.current.play()
+        }
+        // Fade in navbar 2.5s after video starts
+        const navEl = document.querySelector('nav')
+        if (navEl) {
+          setTimeout(() => {
+            gsap.to(navEl, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+            })
+          }, 2500)
+        }
+      },
       onComplete: () => {
         if (overlayRef.current) {
           overlayRef.current.style.display = 'none'
@@ -74,64 +101,40 @@ export default function Hero() {
       },
     })
 
-    // Step 3: "AGENTIC" slides DOWN from top — SLOW elevator
-    // duration 4s so it crawls down gracefully
-    tl.to(agenticRef.current, {
-      y: 0,
-      duration: 4,
-      ease: 'power2.inOut',
+    // AGENTIC + MONKEY appear immediately as overlay fades — no gap
+    tl.from('.agentic-char', {
+      y: 100,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.04,
     }, '-=0.3')
 
-    // Step 4: "MONKEY" rises UP — starts as soon as AGENTIC becomes visible
-    // AGENTIC starts at -100vh, so ~0.8s in it peeks onto screen → MONKEY starts
-    tl.to(monkeyBlockRef.current, {
-      y: 0,
-      duration: 4,
-      ease: 'power2.inOut',
-    }, '<0.8')
-
-    // Step 5: BOUNCE impact when MONKEY arrives
-    tl.to('.monkey-text', {
-      y: -20,
-      scaleY: 0.9,
-      scaleX: 1.05,
-      duration: 0.15,
-      ease: 'power2.in',
-    })
-    .to('.monkey-text', {
-      y: 0,
-      scaleY: 1,
-      scaleX: 1,
+    tl.from('.monkey-char', {
+      y: 100,
+      opacity: 0,
       duration: 0.6,
-      ease: 'bounce.out',
-    })
+      stagger: 0.04,
+    }, '-=0.4')
 
-    // Step 6: Subtitle + CTA settle
+    // Subtitle
     tl.from('.hero-subtitle', {
+      y: 30,
       opacity: 0,
-      y: 20,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, '<0.1')
-    .from('.hero-cta', {
-      opacity: 0,
-      y: 20,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, '<0.1')
+      duration: 0.4,
+    }, '-=0.3')
 
-    // Step 7: Navbar fades in AFTER monkey bounce
-    tl.to('nav', {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: 'power2.out',
-    })
+    // CTA
+    tl.from('.hero-cta', {
+      scale: 0,
+      opacity: 0,
+      duration: 0.4,
+      ease: 'back.out(2)',
+    }, '-=0.2')
 
     // Scroll indicator
     tl.from('.scroll-indicator', {
       opacity: 0,
-      duration: 0.5,
+      duration: 0.3,
     })
 
     // Parallax on scroll
@@ -151,30 +154,31 @@ export default function Hero() {
   }, { scope: heroRef })
 
   return (
-    <section ref={heroRef} className="relative min-h-screen overflow-hidden">
-      {/* Intro overlay */}
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4">
+      {/* Intro overlay — WELCOME TO */}
       <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
         <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
           WELCOME
         </span>
-        <span ref={countRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase absolute opacity-0">
+        <span ref={toRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase absolute opacity-0">
           TO
         </span>
       </div>
 
+      {/* Ambient background glow */}
+      <div className="hero-ambient" />
+      
+      {/* Subtle grid */}
+      <div className="hero-grid" />
+
       {/* Film grain overlay */}
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
-      {/* Atmospheric glow blurs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange/8 rounded-full blur-[120px]" />
-      <div className="absolute top-10 right-20 w-48 h-48 bg-orange/5 rounded-full blur-[80px]" />
-      <div className="absolute bottom-20 left-10 w-64 h-64 bg-orange/3 rounded-full blur-[100px]" />
-
-      {/* Floating particles */}
+      {/* Floating particles — z-30 so they render OVER the video */}
       {Array.from({ length: 20 }).map((_, i) => (
         <div
           key={i}
-          className="absolute rounded-full bg-orange/60"
+          className="absolute rounded-full bg-orange/60 z-30 pointer-events-none"
           style={{
             width: `${2 + Math.random() * 4}px`,
             height: `${2 + Math.random() * 4}px`,
@@ -187,62 +191,84 @@ export default function Hero() {
         />
       ))}
 
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4">
-        {/* AGENTIC - slides from top */}
-        <div 
-          ref={agenticRef} 
-          className="agentic-text"
-          style={{ transform: 'translateY(-100vh)', willChange: 'transform' }}
-        >
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter text-[clamp(3rem,12vw,10rem)] text-white">
+      <div className="relative z-10 text-center max-w-7xl mx-auto w-full">
+        {/* AGENTIC */}
+        <div className="agentic-text mb-4">
+          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
             <SplitText
               text="AGENTIC"
               id="agentic"
+              className="text-[clamp(3rem,12vw,10rem)] text-white"
             />
           </h1>
         </div>
-        
-        {/* Space for mascot video (Phase 2 — Veo 3 or new approach) */}
-        <div className="h-32 md:h-48 lg:h-64" />
-        
-        {/* MONKEY + subtitle + CTA - rises from bottom */}
-        <div 
-          ref={monkeyBlockRef}
-          style={{ transform: 'translateY(100vh)', willChange: 'transform' }}
+
+        {/* Mascot animation video */}
+        <div className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
+          style={{
+            mask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
+            WebkitMask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
+          }}
         >
-          <div className="monkey-text" style={{ willChange: 'transform' }}>
-            <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter text-[clamp(3.5rem,13vw,11rem)]">
-              <SplitText
-                text="MONKEY"
-                id="monkey"
-                className="gradient-text"
-              />
-            </h1>
-          </div>
+          {/* Intro — plays once */}
+          <video
+            ref={introVideoRef}
+            muted
+            playsInline
+            preload="auto"
+            autoPlay
+            onEnded={handleIntroEnd}
+            className="w-full h-auto"
+            style={{ display: introEnded ? 'none' : 'block' }}
+          >
+            <source src="/mascot-intro.mp4?v=6" type="video/mp4" />
+          </video>
+          {/* Loop — plays forever after intro ends */}
+          <video
+            ref={loopVideoRef}
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="w-full h-auto"
+            style={{ display: introEnded ? 'block' : 'none' }}
+          >
+            <source src="/mascot-loop.mp4?v=6" type="video/mp4" />
+          </video>
+        </div>
 
-          {/* Subtitle */}
-          <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
-            Engineers of Autonomy
-          </p>
+        {/* MONKEY */}
+        <div className="monkey-text">
+          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
+            <SplitText
+              text="MONKEY"
+              id="monkey"
+              className="text-[clamp(3rem,12vw,10rem)] gradient-text"
+            />
+          </h1>
+        </div>
 
-          {/* CTA buttons */}
-          <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
-            >
-              Book a Consultation
-            </a>
-            <a
-              href="#services"
-              className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
-            >
-              See Our Work
-            </a>
-          </div>
+        {/* Subtitle */}
+        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
+          Engineers of Autonomy
+        </p>
+
+        {/* CTA buttons */}
+        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
+          <a
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
+          >
+            Book a Consultation
+          </a>
+          <a
+            href="#services"
+            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
+          >
+            See Our Work
+          </a>
         </div>
       </div>
 
