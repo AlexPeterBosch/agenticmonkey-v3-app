@@ -29,7 +29,7 @@ function App() {
 
   return (
     <SmoothScroll>
-      <div className="bg-black min-h-screen text-white relative selection:bg-orange selection:text-white overflow-hidden noise-overlay">
+      <div className="bg-black min-h-screen text-white relative selection:bg-orange selection:text-white noise-overlay">
         <div ref={glowRef} className="cursor-glow hidden md:block" />
         <GridLines />
         <Navbar />

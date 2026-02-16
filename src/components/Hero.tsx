@@ -7,20 +7,192 @@ gsap.registerPlugin(ScrollTrigger)
 
 const BOOKING_URL = 'https://cal.com/alex-bosch-nodozz/30min'
 
+const GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&<>{}[]アイウエオカキクケコ'
+
 function SplitText({ text, className, id }: { text: string; className?: string; id: string }) {
   return (
-    <span className="inline-block overflow-hidden">
+    <span className="inline-block">
       {text.split('').map((char, i) => (
         <span
           key={i}
           className={`${id}-char inline-block ${className || ''}`}
           style={{ display: 'inline-block' }}
+          data-char={char}
         >
           {char === ' ' ? '\u00A0' : char}
         </span>
       ))}
     </span>
   )
+}
+
+function glitchText(selector: string, durationMs: number, resolve: boolean = true) {
+  const chars = document.querySelectorAll(selector) as NodeListOf<HTMLElement>
+  if (!chars.length) return null
+  const originals = Array.from(chars).map(el => el.dataset.char || el.textContent || '')
+  const startTime = Date.now()
+  const interval = setInterval(() => {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / durationMs, 1)
+    chars.forEach((el, i) => {
+      if (resolve) {
+        const resolveAt = 0.3 + (i / chars.length) * 0.6
+        if (progress >= resolveAt) {
+          el.textContent = originals[i] === ' ' ? '\u00A0' : originals[i]
+          el.style.textShadow = ''
+          el.style.opacity = '1'
+          return
+        }
+      }
+      el.textContent = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+      el.style.textShadow = Math.random() > 0.5
+        ? '0 0 8px rgba(255,107,44,0.8), 0 0 20px rgba(255,107,44,0.3)'
+        : '0 0 8px rgba(0,255,200,0.6), 0 0 20px rgba(0,255,200,0.2)'
+      el.style.opacity = `${0.6 + Math.random() * 0.4}`
+    })
+    if (resolve && progress >= 1) {
+      clearInterval(interval)
+      chars.forEach((el, i) => {
+        el.textContent = originals[i] === ' ' ? '\u00A0' : originals[i]
+        el.style.textShadow = ''
+        el.style.opacity = '1'
+      })
+    }
+  }, 35)
+  return interval
+}
+
+function createCharacterExplosion() {
+  const chars = document.querySelectorAll('.monkey-char') as NodeListOf<HTMLElement>
+  if (!chars.length) return
+
+  const firstChar = chars[0]?.getBoundingClientRect()
+  const lastChar = chars[chars.length - 1]?.getBoundingClientRect()
+  const cx = firstChar && lastChar ? (firstChar.left + lastChar.right) / 2 : window.innerWidth * 0.75
+  const cy = firstChar ? (firstChar.top + firstChar.bottom) / 2 : window.innerHeight * 0.4
+
+  // Brief white flash at epicenter
+  const flash = document.createElement('div')
+  Object.assign(flash.style, {
+    position: 'fixed', left: `${cx}px`, top: `${cy}px`,
+    width: '60px', height: '60px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,107,44,0.4) 50%, transparent 100%)',
+    transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: '260',
+  })
+  document.body.appendChild(flash)
+  gsap.to(flash, { scale: 8, opacity: 0, duration: 0.5, ease: 'power2.out', onComplete: () => flash.remove() })
+
+  // Matrix character explosion — spawn ~150 flying glitch characters
+  const EXPLODE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&<>{}[]アイウエオカキクケコサシスセソタチツテトナニヌネノ'
+  const particleCount = 150
+  for (let i = 0; i < particleCount; i++) {
+    const el = document.createElement('span')
+    const char = EXPLODE_CHARS[Math.floor(Math.random() * EXPLODE_CHARS.length)]
+    el.textContent = char
+    const fontSize = 10 + Math.random() * 40 // mix of sizes
+    const isOrange = Math.random() > 0.3
+    const isCyan = !isOrange && Math.random() > 0.5
+    const color = isOrange
+      ? `rgb(255,${(70 + Math.random() * 80) | 0},${(20 + Math.random() * 40) | 0})`
+      : isCyan
+        ? `rgb(0,${(200 + Math.random() * 55) | 0},${(180 + Math.random() * 75) | 0})`
+        : `rgba(255,255,255,${0.5 + Math.random() * 0.5})`
+    const glow = isOrange
+      ? '0 0 12px rgba(255,107,44,0.9), 0 0 25px rgba(255,107,44,0.4)'
+      : isCyan
+        ? '0 0 10px rgba(0,255,200,0.8), 0 0 20px rgba(0,255,200,0.3)'
+        : '0 0 8px rgba(255,255,255,0.5)'
+
+    // Spread spawn origin across the MONKEY text area (not just center)
+    const spawnX = firstChar && lastChar
+      ? firstChar.left + Math.random() * (lastChar.right - firstChar.left)
+      : cx + (Math.random() - 0.5) * 200
+    const spawnY = firstChar
+      ? firstChar.top + Math.random() * (firstChar.bottom - firstChar.top)
+      : cy + (Math.random() - 0.5) * 40
+
+    Object.assign(el.style, {
+      position: 'fixed',
+      left: `${spawnX}px`,
+      top: `${spawnY}px`,
+      fontSize: `${fontSize}px`,
+      fontFamily: 'monospace',
+      fontWeight: 'bold',
+      color,
+      textShadow: glow,
+      pointerEvents: 'none',
+      zIndex: '250',
+      willChange: 'transform, opacity',
+    })
+    document.body.appendChild(el)
+
+    // Explosion vector — spread in all directions, bias upward and outward
+    const angle = Math.random() * Math.PI * 2
+    const speed = 200 + Math.random() * 800
+    const xDist = Math.cos(angle) * speed
+    const yDist = Math.sin(angle) * speed - (100 + Math.random() * 200) // upward bias
+    const spinDeg = (Math.random() - 0.5) * 1440 // wild rotation
+
+    // Cycle through random chars while flying
+    const charCycleInterval = setInterval(() => {
+      el.textContent = EXPLODE_CHARS[Math.floor(Math.random() * EXPLODE_CHARS.length)]
+    }, 50)
+
+    gsap.to(el, {
+      x: xDist,
+      y: yDist,
+      rotation: spinDeg,
+      opacity: 0,
+      scale: Math.random() * 0.5, // shrink as they fly
+      duration: 0.8 + Math.random() * 1.5,
+      ease: 'power3.out',
+      onComplete: () => {
+        clearInterval(charCycleInterval)
+        el.remove()
+      },
+    })
+  }
+
+  // Extra: some characters "rain down" slowly like falling matrix code
+  for (let i = 0; i < 30; i++) {
+    const rain = document.createElement('span')
+    rain.textContent = EXPLODE_CHARS[Math.floor(Math.random() * EXPLODE_CHARS.length)]
+    const fontSize = 8 + Math.random() * 18
+    const startX = firstChar && lastChar
+      ? firstChar.left - 100 + Math.random() * (lastChar.right - firstChar.left + 200)
+      : cx + (Math.random() - 0.5) * 400
+    const startY = cy - 50 + Math.random() * 100
+
+    Object.assign(rain.style, {
+      position: 'fixed',
+      left: `${startX}px`,
+      top: `${startY}px`,
+      fontSize: `${fontSize}px`,
+      fontFamily: 'monospace',
+      color: `rgba(255,107,44,${0.3 + Math.random() * 0.5})`,
+      textShadow: '0 0 6px rgba(255,107,44,0.4)',
+      pointerEvents: 'none',
+      zIndex: '190',
+    })
+    document.body.appendChild(rain)
+
+    const rainInterval = setInterval(() => {
+      rain.textContent = EXPLODE_CHARS[Math.floor(Math.random() * EXPLODE_CHARS.length)]
+    }, 80)
+
+    gsap.to(rain, {
+      y: 300 + Math.random() * 500,
+      x: (Math.random() - 0.5) * 100,
+      opacity: 0,
+      duration: 1.5 + Math.random() * 2.0,
+      delay: Math.random() * 0.6,
+      ease: 'power1.in',
+      onComplete: () => {
+        clearInterval(rainInterval)
+        rain.remove()
+      },
+    })
+  }
 }
 
 export default function Hero() {
@@ -30,7 +202,13 @@ export default function Hero() {
   const toRef = useRef<HTMLSpanElement>(null)
   const introVideoRef = useRef<HTMLVideoElement>(null)
   const loopVideoRef = useRef<HTMLVideoElement>(null)
+  const agenticRef = useRef<HTMLDivElement>(null)
+  const monkeyGroupRef = useRef<HTMLDivElement>(null)
+  const mascotRef = useRef<HTMLDivElement>(null)
+  const platformRef = useRef<HTMLDivElement>(null)
+  const taglineRef = useRef<HTMLDivElement>(null)
   const [introEnded, setIntroEnded] = useState(false)
+  const splitTLRef = useRef<gsap.core.Timeline | null>(null)
 
   const handleIntroEnd = useCallback(() => {
     setIntroEnded(true)
@@ -41,7 +219,6 @@ export default function Hero() {
   }, [])
 
   useGSAP(() => {
-    // Hide navbar initially, fade in after 2.5s of video playing
     const navEl = document.querySelector('nav')
     if (navEl) {
       navEl.style.opacity = '0'
@@ -50,92 +227,207 @@ export default function Hero() {
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // Step 1: "WELCOME" flash — faster
-    tl.to(welcomeRef.current, {
-      opacity: 1,
-      duration: 0.3,
-    })
-    .to(welcomeRef.current, {
-      opacity: 0,
-      duration: 0.2,
-      delay: 0.6,
-    })
+    // WELCOME flash
+    tl.to(welcomeRef.current, { opacity: 1, duration: 0.2 })
+      .to(welcomeRef.current, { opacity: 0, duration: 0.15, delay: 0.35 })
 
-    // Step 2: "TO" flash — faster
-    tl.to(toRef.current, {
-      opacity: 1,
-      duration: 0.3,
-    })
-    .to(toRef.current, {
-      opacity: 0,
-      duration: 0.2,
-      delay: 0.5,
-    })
+    // TO flash
+    tl.to(toRef.current, { opacity: 1, duration: 0.2 })
+      .to(toRef.current, { opacity: 0, duration: 0.15, delay: 0.3 })
 
-    // Fade out overlay — start video + text immediately
+    // Fade overlay → start video
     tl.to(overlayRef.current, {
       opacity: 0,
-      duration: 0.3,
+      duration: 0.2,
       onStart: () => {
         if (introVideoRef.current) {
           introVideoRef.current.currentTime = 0
           introVideoRef.current.play()
         }
-        // Fade in navbar 2.5s after video starts
-        const navEl = document.querySelector('nav')
-        if (navEl) {
+        const nav = document.querySelector('nav')
+        if (nav) {
           setTimeout(() => {
-            gsap.to(navEl, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: 'power2.out',
-            })
+            gsap.to(nav, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' })
           }, 2500)
         }
       },
       onComplete: () => {
-        if (overlayRef.current) {
-          overlayRef.current.style.display = 'none'
-        }
+        if (overlayRef.current) overlayRef.current.style.display = 'none'
       },
     })
 
-    // AGENTIC + MONKEY appear immediately as overlay fades — no gap
-    tl.from('.agentic-char', {
-      y: 100,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.04,
-    }, '-=0.3')
+    // Text appears
+    tl.from('.agentic-char', { y: 100, opacity: 0, duration: 0.5, stagger: 0.03 }, '-=0.2')
+    tl.from('.monkey-char', { y: 100, opacity: 0, duration: 0.5, stagger: 0.03 }, '-=0.35')
+    tl.from('.hero-subtitle', { y: 30, opacity: 0, duration: 0.3 }, '-=0.25')
+    tl.from('.hero-cta', { scale: 0, opacity: 0, duration: 0.3, ease: 'back.out(2)' }, '-=0.15')
+    tl.from('.scroll-indicator', { opacity: 0, duration: 0.2 })
 
-    tl.from('.monkey-char', {
-      y: 100,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.04,
-    }, '-=0.4')
+    // Fire split 1.5s after text appears
+    tl.add(() => { splitTLRef.current?.play() }, '+=1.5')
 
-    // Subtitle
-    tl.from('.hero-subtitle', {
-      y: 30,
-      opacity: 0,
-      duration: 0.4,
-    }, '-=0.3')
+    // ─── SPLIT TIMELINE ───
+    const splitTL = gsap.timeline({ paused: true })
+    splitTLRef.current = splitTL
 
-    // CTA
-    tl.from('.hero-cta', {
-      scale: 0,
-      opacity: 0,
-      duration: 0.4,
-      ease: 'back.out(2)',
-    }, '-=0.2')
+    // Phase 1: AGENTIC slides LEFT, MONKEY+mascot slides RIGHT (0–1.2s)
+    splitTL.to(agenticRef.current, {
+      x: () => {
+        const firstChar = document.querySelector('.agentic-char')
+        if (!firstChar) return -500
+        return -firstChar.getBoundingClientRect().left
+      },
+      duration: 1.0,
+      ease: 'power4.in', // ACCELERATE into the wall — matches MONKEY
+      onStart: () => glitchText('.agentic-char', 1000, true), // glitch during 1s slide, then resolve
+    }, 0)
 
-    // Scroll indicator
-    tl.from('.scroll-indicator', {
-      opacity: 0,
-      duration: 0.3,
-    })
+    splitTL.to(monkeyGroupRef.current, {
+      x: () => {
+        const allChars = document.querySelectorAll('.monkey-char')
+        const lastChar = allChars[allChars.length - 1]
+        if (!lastChar) return 500
+        return window.innerWidth - lastChar.getBoundingClientRect().right
+      },
+      duration: 1.0,
+      ease: 'power4.in', // ACCELERATE into the wall — no deceleration, SLAMS into edge
+      onStart: () => glitchText('.monkey-char', 999999, false),
+      onComplete: () => {
+        // INSTANT explosion the frame MONKEY hits the right edge
+        createCharacterExplosion()
+        gsap.set('.monkey-text', { opacity: 0 }) // gsap.set = instant, no tween delay
+      },
+    }, 0)
+
+    // Fade out subtitle + CTA
+    splitTL.to('.hero-subtitle', { opacity: 0, y: -20, duration: 0.3 }, 0)
+    splitTL.to('.hero-cta', { opacity: 0, y: -20, duration: 0.3 }, 0)
+    splitTL.to('.scroll-indicator', { opacity: 0, duration: 0.2 }, 0)
+
+    // Mascot detaches and drops STRAIGHT DOWN onto platform — fires at 1.0s (when MONKEY hits edge)
+    splitTL.add(() => {
+      if (!mascotRef.current || !platformRef.current) return
+
+      const mascotEl = mascotRef.current
+      const mascotRect = mascotEl.getBoundingClientRect()
+
+      // Reparent to body, lock at current screen position
+      mascotEl.style.position = 'fixed'
+      mascotEl.style.left = `${mascotRect.left}px`
+      mascotEl.style.top = `${mascotRect.top}px`
+      mascotEl.style.width = `${mascotRect.width}px`
+      mascotEl.style.height = `${mascotRect.height}px`
+      mascotEl.style.zIndex = '25'
+      mascotEl.style.margin = '0'
+      mascotEl.style.maxWidth = 'none'
+      document.body.appendChild(mascotEl)
+      gsap.set(mascotEl, { x: 0, y: 0 })
+
+      // Move platform to be directly under the mascot (not the other way around)
+      const platEl = platformRef.current
+      platEl.style.left = `${mascotRect.left}px`
+      platEl.style.right = 'auto'
+      platEl.style.bottom = 'auto'
+      platEl.style.top = `${window.innerHeight * 0.82}px` // 82% down the viewport
+      platEl.style.width = `${mascotRect.width}px` // match mascot width
+
+      const platRect = platEl.getBoundingClientRect()
+
+      // Drop STRAIGHT DOWN — only animate top, keep left EXACTLY the same
+      const landingY = platRect.top - mascotRect.height + 15
+      gsap.to(mascotEl, {
+        top: landingY,
+        duration: 0.6,
+        ease: 'power3.in', // accelerate downward like gravity
+        onComplete: () => {
+          // Bounce on impact
+          gsap.to(mascotEl, {
+            y: -20,
+            duration: 0.1,
+            ease: 'power2.out',
+            onComplete: () => {
+              gsap.to(mascotEl, { y: 0, duration: 0.35, ease: 'bounce.out' })
+            }
+          })
+        }
+      })
+
+      // Platform appears just before mascot lands
+      gsap.to(platEl, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.25 })
+    }, 1.0)
+
+    // Phase 3: Scrambled text block shoots from RIGHT → LEFT, resolves into tagline
+    splitTL.add(() => {
+      if (!taglineRef.current) return
+      const tagEl = taglineRef.current
+
+      // Make visible, position off-screen right
+      tagEl.style.opacity = '1'
+      gsap.set(tagEl, { x: window.innerWidth + 200 })
+
+      // Start glitching all tagline chars immediately
+      const tagChars = tagEl.querySelectorAll('.tagline-char') as NodeListOf<HTMLElement>
+      const originals = Array.from(tagChars).map(el => el.dataset.char || el.textContent || '')
+
+      // Start the scramble — all chars cycling randomly
+      const glitchInterval = setInterval(() => {
+        tagChars.forEach((el) => {
+          el.textContent = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+          el.style.textShadow = Math.random() > 0.5
+            ? '0 0 8px rgba(255,107,44,0.8), 0 0 20px rgba(255,107,44,0.3)'
+            : '0 0 8px rgba(0,255,200,0.6), 0 0 20px rgba(0,255,200,0.2)'
+          el.style.opacity = `${0.6 + Math.random() * 0.4}`
+        })
+      }, 35)
+
+      // Fade out AGENTIC text as tagline comes in
+      gsap.to(agenticRef.current, { opacity: 0, duration: 0.4 })
+
+      // Shoot from right to left position
+      gsap.to(tagEl, {
+        x: 0,
+        duration: 0.8,
+        ease: 'power4.out', // fast entry, decelerates into position
+        onComplete: () => {
+          // Now resolve characters left-to-right with stagger
+          const resolveDuration = 1200 // 1.2s to resolve all chars
+          const startTime = Date.now()
+
+          const resolveInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime
+            const progress = Math.min(elapsed / resolveDuration, 1)
+            let allResolved = true
+
+            tagChars.forEach((el, i) => {
+              const resolveAt = (i / tagChars.length) * 0.85 // stagger across 85% of duration
+              if (progress >= resolveAt) {
+                el.textContent = originals[i] === ' ' ? '\u00A0' : originals[i]
+                el.style.textShadow = ''
+                el.style.opacity = '1'
+                el.style.color = '' // reset to CSS color
+              } else {
+                allResolved = false
+              }
+            })
+
+            if (allResolved || progress >= 1) {
+              clearInterval(resolveInterval)
+              clearInterval(glitchInterval)
+              // Final cleanup — ensure all chars are correct
+              tagChars.forEach((el, i) => {
+                el.textContent = originals[i] === ' ' ? '\u00A0' : originals[i]
+                el.style.textShadow = ''
+                el.style.opacity = '1'
+                el.style.color = ''
+              })
+              // Fade in subtext + CTA after resolve
+              gsap.to('.tagline-sub', { opacity: 1, y: 0, duration: 0.5, delay: 0.2 })
+              gsap.fromTo('.tagline-cta', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.5 })
+            }
+          }, 35)
+        }
+      })
+    }, 1.8) // fires 0.8s after explosion (gives mascot time to start dropping)
 
     // Parallax on scroll
     ScrollTrigger.create({
@@ -147,15 +439,13 @@ export default function Hero() {
         const p = self.progress
         gsap.set('.agentic-text', { y: p * -80 })
         gsap.set('.monkey-text', { y: p * -60 })
-        gsap.set('.hero-subtitle', { y: p * -40 })
-        gsap.set('.hero-cta', { y: p * -30 })
       },
     })
   }, { scope: heroRef })
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4">
-      {/* Intro overlay — WELCOME TO */}
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4">
+      {/* Intro overlay */}
       <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
         <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
           WELCOME
@@ -165,16 +455,12 @@ export default function Hero() {
         </span>
       </div>
 
-      {/* Ambient background glow */}
+      {/* Ambient effects */}
       <div className="hero-ambient" />
-      
-      {/* Subtle grid */}
       <div className="hero-grid" />
-
-      {/* Film grain overlay */}
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
-      {/* Floating particles — z-30 so they render OVER the video */}
+      {/* Floating particles */}
       {Array.from({ length: 20 }).map((_, i) => (
         <div
           key={i}
@@ -193,59 +479,145 @@ export default function Hero() {
 
       <div className="relative z-10 text-center max-w-7xl mx-auto w-full">
         {/* AGENTIC */}
-        <div className="agentic-text mb-4">
+        <div ref={agenticRef} className="agentic-text mb-4">
           <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
-            <SplitText
-              text="AGENTIC"
-              id="agentic"
-              className="text-[clamp(3rem,12vw,10rem)] text-white"
-            />
+            <SplitText text="AGENTIC" id="agentic" className="text-[clamp(3rem,12vw,10rem)] text-white" />
           </h1>
         </div>
 
-        {/* Mascot animation video */}
-        <div className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
-          style={{
-            mask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
-            WebkitMask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
-          }}
-        >
-          {/* Intro — plays once */}
-          <video
-            ref={introVideoRef}
-            muted
-            playsInline
-            preload="auto"
-            autoPlay
-            onEnded={handleIntroEnd}
-            className="w-full h-auto"
-            style={{ display: introEnded ? 'none' : 'block' }}
+        {/* MONKEY + MASCOT group — moves right together */}
+        <div ref={monkeyGroupRef}>
+          {/* Mascot video — has its own ref so it can drop independently */}
+          <div ref={mascotRef} className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
+            style={{
+              mask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
+              WebkitMask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
+            }}
           >
-            <source src="/mascot-intro.mp4?v=6" type="video/mp4" />
-          </video>
-          {/* Loop — plays forever after intro ends */}
-          <video
-            ref={loopVideoRef}
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-auto"
-            style={{ display: introEnded ? 'block' : 'none' }}
-          >
-            <source src="/mascot-loop.mp4?v=6" type="video/mp4" />
-          </video>
+            <video
+              ref={introVideoRef}
+              muted
+              playsInline
+              preload="auto"
+              autoPlay
+              onEnded={handleIntroEnd}
+              className="w-full h-auto"
+              style={{ display: introEnded ? 'none' : 'block' }}
+            >
+              <source src="/mascot-intro.mp4?v=6" type="video/mp4" />
+            </video>
+            <video
+              ref={loopVideoRef}
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-auto"
+              style={{ display: introEnded ? 'block' : 'none' }}
+            >
+              <source src="/mascot-loop.mp4?v=6" type="video/mp4" />
+            </video>
+          </div>
+
+          {/* MONKEY text */}
+          <div className="monkey-text">
+            <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
+              <SplitText text="MONKEY" id="monkey" className="text-[clamp(3rem,12vw,10rem)] gradient-text" />
+            </h1>
+          </div>
         </div>
 
-        {/* MONKEY */}
-        <div className="monkey-text">
-          <h1 className="font-[var(--font-display)] font-bold uppercase leading-[0.85] tracking-tighter">
-            <SplitText
-              text="MONKEY"
-              id="monkey"
-              className="text-[clamp(3rem,12vw,10rem)] gradient-text"
-            />
-          </h1>
+        {/* Platform — positioned dynamically under mascot after explosion */}
+        <div ref={platformRef} className="fixed z-20" style={{ bottom: '15%', right: '10%', opacity: 0 }}>
+          {/* Wide ambient ground glow */}
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[160%] h-20 rounded-full blur-3xl"
+            style={{ background: 'radial-gradient(ellipse 80% 100%, rgba(255,107,44,0.3) 0%, rgba(255,60,10,0.1) 40%, transparent 70%)' }} />
+          {/* Platform structure */}
+          <div className="relative w-full">
+            {/* Bright top edge — the main visible line */}
+            <div className="absolute inset-x-[2%] -top-[1px] h-[3px] rounded-full z-10"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,140,50,0.5) 15%, rgba(255,180,80,1) 35%, rgba(255,220,150,1) 50%, rgba(255,180,80,1) 65%, rgba(255,140,50,0.5) 85%, transparent 100%)',
+                boxShadow: '0 0 12px rgba(255,150,50,0.8), 0 0 30px rgba(255,107,44,0.4)',
+              }} />
+            {/* Main dark surface — thick elliptical disc */}
+            <div className="w-full rounded-[50%] relative overflow-hidden"
+              style={{
+                height: '18px',
+                background: 'linear-gradient(180deg, #222 0%, #151515 30%, #0a0a0a 100%)',
+                boxShadow: '0 4px 30px rgba(255,107,44,0.2), 0 0 80px rgba(255,107,44,0.08), inset 0 2px 1px rgba(255,160,80,0.25), inset 0 -2px 4px rgba(0,0,0,0.9)',
+              }}>
+              {/* Surface highlight streak */}
+              <div className="absolute top-[3px] left-[10%] right-[10%] h-[1px] rounded-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,160,80,0.15), rgba(255,180,100,0.2), rgba(255,160,80,0.15), transparent)' }} />
+            </div>
+            {/* Bottom rim shadow */}
+            <div className="w-[92%] mx-auto rounded-[50%] -mt-[2px]"
+              style={{
+                height: '6px',
+                background: 'linear-gradient(180deg, rgba(255,107,44,0.08) 0%, transparent 100%)',
+              }} />
+          </div>
+          {/* Floor reflection — soft pool of light below platform */}
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[130%] h-12 rounded-full blur-2xl"
+            style={{ background: 'radial-gradient(ellipse, rgba(255,107,44,0.1) 0%, transparent 70%)' }} />
+        </div>
+
+        {/* Tagline — shoots from right, resolves on left */}
+        <div ref={taglineRef} className="fixed left-[5%] top-1/2 -translate-y-1/2 z-30 text-left" style={{ opacity: 0 }}>
+          <div className="flex flex-col gap-1">
+            {/* Line 1: Deploy Your */}
+            <div>
+              {'Deploy Your'.split('').map((char, i) => (
+                <span
+                  key={`t1-${i}`}
+                  className="tagline-char inline-block text-[clamp(1.5rem,3.5vw,3.5rem)] font-[var(--font-display)] font-bold text-white/60 uppercase tracking-wide"
+                  data-char={char}
+                  style={{ display: 'inline-block' }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </div>
+            {/* Line 2: DIGITAL — big and bold */}
+            <div>
+              {'Digital'.split('').map((char, i) => (
+                <span
+                  key={`t2-${i}`}
+                  className="tagline-char inline-block text-[clamp(3rem,8vw,7rem)] font-[var(--font-display)] font-bold text-white uppercase leading-[0.9] tracking-tighter"
+                  data-char={char}
+                  style={{ display: 'inline-block' }}
+                >
+                  {char}
+                </span>
+              ))}
+            </div>
+            {/* Line 3: WORKFORCE — big and bold */}
+            <div>
+              {'Workforce'.split('').map((char, i) => (
+                <span
+                  key={`t3-${i}`}
+                  className="tagline-char inline-block text-[clamp(3rem,8vw,7rem)] font-[var(--font-display)] font-bold gradient-text uppercase leading-[0.9] tracking-tighter"
+                  data-char={char}
+                  style={{ display: 'inline-block' }}
+                >
+                  {char}
+                </span>
+              ))}
+            </div>
+          </div>
+          {/* Subtext appears after tagline resolves */}
+          <p className="tagline-sub mt-6 text-[clamp(0.8rem,1.5vw,1.1rem)] text-white/40 max-w-md leading-relaxed opacity-0">
+            Outpace the competition with custom AI agents.<br/>
+            We turn manual bottlenecks into automated growth engines.
+          </p>
+          {/* CTA button */}
+          <div className="tagline-cta mt-8 opacity-0">
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
+              className="inline-block bg-orange hover:bg-orange-dark text-white px-8 py-3 rounded-full text-base font-bold transition-all hover:scale-105 animate-pulse-glow">
+              Book a Consultation →
+            </a>
+          </div>
         </div>
 
         {/* Subtitle */}
@@ -255,18 +627,12 @@ export default function Hero() {
 
         {/* CTA buttons */}
         <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow"
-          >
+          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
+            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow">
             Book a Consultation
           </a>
-          <a
-            href="#services"
-            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105"
-          >
+          <a href="#services"
+            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105">
             See Our Work
           </a>
         </div>
