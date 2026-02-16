@@ -325,11 +325,14 @@ export default function Hero() {
 
       // Move platform to be directly under the mascot (not the other way around)
       const platEl = platformRef.current
-      platEl.style.left = `${mascotRect.left}px`
+      // Platform is ~35% of mascot width, centered under the feet
+      const platWidth = mascotRect.width * 0.35
+      const platLeft = mascotRect.left + (mascotRect.width - platWidth) / 2
+      platEl.style.left = `${platLeft}px`
       platEl.style.right = 'auto'
       platEl.style.bottom = 'auto'
       platEl.style.top = `${window.innerHeight * 0.82}px` // 82% down the viewport
-      platEl.style.width = `${mascotRect.width}px` // match mascot width
+      platEl.style.width = `${platWidth}px` // just under the feet
 
       const platRect = platEl.getBoundingClientRect()
 
@@ -354,6 +357,8 @@ export default function Hero() {
 
       // Platform appears just before mascot lands
       gsap.to(platEl, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.25 })
+
+      // Platform is now a simple line — no animation needed
     }, 1.0)
 
     // Phase 3: Scrambled text block shoots from RIGHT → LEFT, resolves into tagline
@@ -389,8 +394,10 @@ export default function Hero() {
         duration: 0.8,
         ease: 'power4.out', // fast entry, decelerates into position
         onComplete: () => {
-          // Now resolve characters left-to-right with stagger
+          // Now resolve characters RIGHT-TO-LEFT with stagger
+          // Last char (end of "Workforce") resolves first, sweeps left to "Deploy"
           const resolveDuration = 1200 // 1.2s to resolve all chars
+          const totalChars = tagChars.length
           const startTime = Date.now()
 
           const resolveInterval = setInterval(() => {
@@ -399,7 +406,9 @@ export default function Hero() {
             let allResolved = true
 
             tagChars.forEach((el, i) => {
-              const resolveAt = (i / tagChars.length) * 0.85 // stagger across 85% of duration
+              // Reverse: last char (totalChars-1) resolves at progress 0, first char resolves last
+              const reverseIndex = totalChars - 1 - i
+              const resolveAt = (reverseIndex / totalChars) * 0.85 // stagger across 85% of duration
               if (progress >= resolveAt) {
                 el.textContent = originals[i] === ' ' ? '\u00A0' : originals[i]
                 el.style.textShadow = ''
@@ -444,7 +453,7 @@ export default function Hero() {
   }, { scope: heroRef })
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4">
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 bg-[#0A0A0A]">
       {/* Intro overlay */}
       <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
         <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
@@ -490,8 +499,8 @@ export default function Hero() {
           {/* Mascot video — has its own ref so it can drop independently */}
           <div ref={mascotRef} className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
             style={{
-              mask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
-              WebkitMask: 'radial-gradient(ellipse 90% 90% at center, black 60%, transparent 100%)',
+              mask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
+              WebkitMask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
             }}
           >
             <video
@@ -527,40 +536,18 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Platform — positioned dynamically under mascot after explosion */}
+        {/* Platform — thin subtle ledge under mascot */}
         <div ref={platformRef} className="fixed z-20" style={{ bottom: '15%', right: '10%', opacity: 0 }}>
-          {/* Wide ambient ground glow */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[160%] h-20 rounded-full blur-3xl"
-            style={{ background: 'radial-gradient(ellipse 80% 100%, rgba(255,107,44,0.3) 0%, rgba(255,60,10,0.1) 40%, transparent 70%)' }} />
-          {/* Platform structure */}
           <div className="relative w-full">
-            {/* Bright top edge — the main visible line */}
-            <div className="absolute inset-x-[2%] -top-[1px] h-[3px] rounded-full z-10"
+            {/* Thin bright top edge */}
+            <div className="w-full h-[2px] rounded-full"
               style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255,140,50,0.5) 15%, rgba(255,180,80,1) 35%, rgba(255,220,150,1) 50%, rgba(255,180,80,1) 65%, rgba(255,140,50,0.5) 85%, transparent 100%)',
-                boxShadow: '0 0 12px rgba(255,150,50,0.8), 0 0 30px rgba(255,107,44,0.4)',
+                background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 70%, transparent 95%)',
               }} />
-            {/* Main dark surface — thick elliptical disc */}
-            <div className="w-full rounded-[50%] relative overflow-hidden"
-              style={{
-                height: '18px',
-                background: 'linear-gradient(180deg, #222 0%, #151515 30%, #0a0a0a 100%)',
-                boxShadow: '0 4px 30px rgba(255,107,44,0.2), 0 0 80px rgba(255,107,44,0.08), inset 0 2px 1px rgba(255,160,80,0.25), inset 0 -2px 4px rgba(0,0,0,0.9)',
-              }}>
-              {/* Surface highlight streak */}
-              <div className="absolute top-[3px] left-[10%] right-[10%] h-[1px] rounded-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,160,80,0.15), rgba(255,180,100,0.2), rgba(255,160,80,0.15), transparent)' }} />
-            </div>
-            {/* Bottom rim shadow */}
-            <div className="w-[92%] mx-auto rounded-[50%] -mt-[2px]"
-              style={{
-                height: '6px',
-                background: 'linear-gradient(180deg, rgba(255,107,44,0.08) 0%, transparent 100%)',
-              }} />
+            {/* Subtle shadow below */}
+            <div className="w-[80%] mx-auto h-3 rounded-full blur-sm mt-[1px]"
+              style={{ background: 'rgba(255,255,255,0.03)' }} />
           </div>
-          {/* Floor reflection — soft pool of light below platform */}
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[130%] h-12 rounded-full blur-2xl"
-            style={{ background: 'radial-gradient(ellipse, rgba(255,107,44,0.1) 0%, transparent 70%)' }} />
         </div>
 
         {/* Tagline — shoots from right, resolves on left */}
@@ -579,9 +566,9 @@ export default function Hero() {
                 </span>
               ))}
             </div>
-            {/* Line 2: DIGITAL — big and bold */}
+            {/* Line 2: AGENTIC — big and bold */}
             <div>
-              {'Digital'.split('').map((char, i) => (
+              {'Agentic'.split('').map((char, i) => (
                 <span
                   key={`t2-${i}`}
                   className="tagline-char inline-block text-[clamp(3rem,8vw,7rem)] font-[var(--font-display)] font-bold text-white uppercase leading-[0.9] tracking-tighter"
@@ -615,26 +602,13 @@ export default function Hero() {
           <div className="tagline-cta mt-8 opacity-0">
             <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
               className="inline-block bg-orange hover:bg-orange-dark text-white px-8 py-3 rounded-full text-base font-bold transition-all hover:scale-105 animate-pulse-glow">
-              Book a Consultation →
+              Let's Chat →
             </a>
           </div>
-        </div>
-
-        {/* Subtitle */}
-        <p className="hero-subtitle mt-8 text-lg md:text-2xl text-[#888] font-[var(--font-body)] tracking-[0.25em] uppercase">
-          Engineers of Autonomy
-        </p>
-
-        {/* CTA buttons */}
-        <div className="hero-cta mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
-          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
-            className="inline-block bg-orange hover:bg-orange-dark text-white px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 animate-pulse-glow">
-            Book a Consultation
-          </a>
-          <a href="#services"
-            className="inline-block border border-white/20 hover:border-orange/50 text-white/80 hover:text-white px-10 py-4 rounded-full text-lg font-medium transition-all hover:scale-105">
-            See Our Work
-          </a>
+          {/* Slogan — below CTA */}
+          <p className="tagline-sub mt-6 text-[clamp(0.7rem,1.2vw,0.9rem)] text-white/25 font-[var(--font-body)] tracking-[0.3em] uppercase opacity-0">
+            Engineers of Autonomy
+          </p>
         </div>
       </div>
 
