@@ -279,7 +279,7 @@ export default function Hero() {
       },
       duration: 1.0,
       ease: 'power4.in', // ACCELERATE into the wall — matches MONKEY
-      onStart: () => glitchText('.agentic-char', 1000, true), // glitch during 1s slide, then resolve
+      onStart: () => { glitchText('.agentic-char', 1000, true) }, // glitch during 1s slide, then resolve
     }, 0)
 
     splitTL.to(monkeyGroupRef.current, {
@@ -291,7 +291,7 @@ export default function Hero() {
       },
       duration: 1.0,
       ease: 'power4.in', // ACCELERATE into the wall — no deceleration, SLAMS into edge
-      onStart: () => glitchText('.monkey-char', 999999, false),
+      onStart: () => { glitchText('.monkey-char', 999999, false) },
       onComplete: () => {
         // INSTANT explosion the frame MONKEY hits the right edge
         createCharacterExplosion()
