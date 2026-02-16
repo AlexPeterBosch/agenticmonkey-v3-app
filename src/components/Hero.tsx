@@ -466,7 +466,6 @@ export default function Hero() {
 
       {/* Ambient effects */}
       <div className="hero-ambient" />
-      <div className="hero-grid" />
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
       {/* Floating particles */}
