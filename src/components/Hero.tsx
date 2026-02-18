@@ -450,6 +450,25 @@ export default function Hero() {
         gsap.set('.monkey-text', { y: p * -60 })
       },
     })
+
+    // Hide fixed hero elements when scrolling past hero section
+    ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: 'bottom 80%',
+      end: 'bottom top',
+      onLeave: () => {
+        // Hide all fixed hero elements when scrolling past
+        gsap.to(taglineRef.current, { opacity: 0, duration: 0.3 })
+        gsap.to(mascotRef.current, { opacity: 0, duration: 0.3 })
+        gsap.to(platformRef.current, { opacity: 0, duration: 0.3 })
+      },
+      onEnterBack: () => {
+        // Show them again when scrolling back up
+        gsap.to(taglineRef.current, { opacity: 1, duration: 0.3 })
+        gsap.to(mascotRef.current, { opacity: 1, duration: 0.3 })
+        gsap.to(platformRef.current, { opacity: 1, duration: 0.3 })
+      },
+    })
   }, { scope: heroRef })
 
   return (
@@ -496,6 +515,7 @@ export default function Hero() {
           {/* Mascot video — has its own ref so it can drop independently */}
           <div ref={mascotRef} className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
             style={{
+              background: '#000000',
               mask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
               WebkitMask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
             }}
