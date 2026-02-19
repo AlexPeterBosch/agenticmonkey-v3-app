@@ -62,8 +62,8 @@ function glitchText(selector: string, durationMs: number, resolve: boolean = tru
   return interval
 }
 
-function createCharacterExplosion() {
-  const chars = document.querySelectorAll('.monkey-char') as NodeListOf<HTMLElement>
+function createCharacterExplosion(charSelector: string = '.monkey-char') {
+  const chars = document.querySelectorAll(charSelector) as NodeListOf<HTMLElement>
   if (!chars.length) return
 
   const firstChar = chars[0]?.getBoundingClientRect()
@@ -209,6 +209,11 @@ export default function Hero() {
   const taglineRef = useRef<HTMLDivElement>(null)
   const [introEnded, setIntroEnded] = useState(false)
   const splitTLRef = useRef<gsap.core.Timeline | null>(null)
+  // Elevator scroll tracking
+  const mascotLandingTopRef = useRef<number>(0)
+  const mascotHasLandedRef = useRef<boolean>(false)
+  const scrollTickerRef = useRef<gsap.TickerCallback | null>(null)
+  const platOffsetRef = useRef<number>(0) // platform CSS top minus mascot CSS top at landing
 
   const handleIntroEnd = useCallback(() => {
     setIntroEnded(true)
@@ -271,6 +276,10 @@ export default function Hero() {
     splitTLRef.current = splitTL
 
     // Phase 1: AGENTIC slides LEFT, MONKEY+mascot slides RIGHT (0–1.2s)
+    // Flags prevent double-firing between onUpdate (98%) and onComplete (fallback)
+    let agenticExploded = false
+    let monkeyExploded = false
+
     splitTL.to(agenticRef.current, {
       x: () => {
         const firstChar = document.querySelector('.agentic-char')
@@ -278,8 +287,23 @@ export default function Hero() {
         return -firstChar.getBoundingClientRect().left
       },
       duration: 1.0,
-      ease: 'power4.in', // ACCELERATE into the wall — matches MONKEY
-      onStart: () => glitchText('.agentic-char', 1000, true), // glitch during 1s slide, then resolve
+      ease: 'power4.in',
+      onStart: () => { agenticExploded = false; glitchText('.agentic-char', 999999, false) },
+      onUpdate: function(this: any) {
+        // Fire at 98% progress — triggers AT wall impact, not 1 frame after
+        if (!agenticExploded && this.progress() >= 0.98) {
+          agenticExploded = true
+          createCharacterExplosion('.agentic-char')
+          gsap.set(agenticRef.current, { opacity: 0 })
+        }
+      },
+      onComplete: () => {
+        if (!agenticExploded) { // safety fallback
+          agenticExploded = true
+          createCharacterExplosion('.agentic-char')
+          gsap.set(agenticRef.current, { opacity: 0 })
+        }
+      },
     }, 0)
 
     splitTL.to(monkeyGroupRef.current, {
@@ -290,12 +314,21 @@ export default function Hero() {
         return window.innerWidth - lastChar.getBoundingClientRect().right
       },
       duration: 1.0,
-      ease: 'power4.in', // ACCELERATE into the wall — no deceleration, SLAMS into edge
-      onStart: () => glitchText('.monkey-char', 999999, false),
+      ease: 'power4.in',
+      onStart: () => { monkeyExploded = false; glitchText('.monkey-char', 999999, false) },
+      onUpdate: function(this: any) {
+        if (!monkeyExploded && this.progress() >= 0.98) {
+          monkeyExploded = true
+          createCharacterExplosion()
+          gsap.set('.monkey-text', { opacity: 0 })
+        }
+      },
       onComplete: () => {
-        // INSTANT explosion the frame MONKEY hits the right edge
-        createCharacterExplosion()
-        gsap.set('.monkey-text', { opacity: 0 }) // gsap.set = instant, no tween delay
+        if (!monkeyExploded) {
+          monkeyExploded = true
+          createCharacterExplosion()
+          gsap.set('.monkey-text', { opacity: 0 })
+        }
       },
     }, 0)
 
@@ -327,7 +360,7 @@ export default function Hero() {
       const platEl = platformRef.current
       // Platform is ~35% of mascot width, centered under the feet
       const platWidth = mascotRect.width * 0.35
-      const platLeft = mascotRect.left + (mascotRect.width - platWidth) / 2
+      const platLeft = mascotRect.left + (mascotRect.width - platWidth) / 2 + 40
       platEl.style.left = `${platLeft}px`
       platEl.style.right = 'auto'
       platEl.style.bottom = 'auto'
@@ -337,7 +370,7 @@ export default function Hero() {
       const platRect = platEl.getBoundingClientRect()
 
       // Drop STRAIGHT DOWN — only animate top, keep left EXACTLY the same
-      const landingY = platRect.top - mascotRect.height + 15
+      const landingY = platRect.top - mascotRect.height + 120
       gsap.to(mascotEl, {
         top: landingY,
         duration: 0.6,
@@ -349,11 +382,35 @@ export default function Hero() {
             duration: 0.1,
             ease: 'power2.out',
             onComplete: () => {
-              gsap.to(mascotEl, { y: 0, duration: 0.35, ease: 'bounce.out' })
+              gsap.to(mascotEl, {
+                y: 0, duration: 0.35, ease: 'bounce.out',
+                onComplete: () => {
+                  // Lock in the final landing position for scroll-driven elevator descent
+                  mascotLandingTopRef.current = parseFloat(mascotEl.style.top || '0')
+                  // Store offset (transform stays active — no clearing needed)
+                  const platEl = platformRef.current
+                  if (platEl) {
+                    platOffsetRef.current = parseFloat(platEl.style.top || '0') - mascotLandingTopRef.current
+                  }
+                  mascotHasLandedRef.current = true
+                }
+              })
             }
           })
         }
       })
+
+      // Pre-position the tube at the exact landing geometry so it fades in glitch-free.
+      // Without this, it briefly shows at the JSX default (500px tall, top:50%) before
+      // the scroll ticker corrects it on the first frame after landing.
+      {
+        const mascotFeetAtLanding = landingY + mascotRect.height
+        const tubeVisTop = mascotFeetAtLanding - 5
+        const initTubeH = Math.max(10, window.innerHeight + 60 - tubeVisTop)
+        platEl.style.top = `${tubeVisTop + initTubeH / 2}px`
+        const initTubeEl = platEl.querySelector('.elevator-tube') as HTMLElement
+        if (initTubeEl) initTubeEl.style.height = `${initTubeH}px`
+      }
 
       // Platform appears just before mascot lands
       gsap.to(platEl, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.25 })
@@ -450,12 +507,83 @@ export default function Hero() {
         gsap.set('.monkey-text', { y: p * -60 })
       },
     })
+
+    // Hide tagline when scrolling past hero
+    ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: 'bottom 80%',
+      end: 'bottom top',
+      onLeave: () => {
+        gsap.to(taglineRef.current, { opacity: 0, duration: 0.3 })
+      },
+      onEnterBack: () => {
+        gsap.to(taglineRef.current, { opacity: 1, duration: 0.3 })
+      },
+    })
+
+    // ─── ELEVATOR SCROLL — mascot descends to PartnersMarquee, sticks to it ───
+    const partnersEl = document.getElementById('partners-marquee')
+    if (partnersEl) {
+      const elevatorTicker: gsap.TickerCallback = () => {
+        const mascotEl = mascotRef.current
+        const platEl = platformRef.current
+        if (!mascotEl || !mascotHasLandedRef.current) return
+
+        const partnersRect = partnersEl.getBoundingClientRect()
+        const mascotH = mascotEl.offsetHeight
+        const landingTop = mascotLandingTopRef.current
+        // Monkey stops 30px above section — only the top rim of the tube
+        // will be visible above "POWERED BY" once the section scrolls up
+        const sectionTrackingTop = partnersRect.top - mascotH - 30
+        const scrollDrivenTop = landingTop + window.scrollY * 0.6
+
+        // 1:1 descent until tracking position, then glue to section
+        const newMascotTop = Math.min(scrollDrivenTop, sectionTrackingTop)
+        mascotEl.style.top = `${newMascotTop}px`
+
+        // Tube: top at mascot feet, always extends to viewport bottom + 60
+        // so it looks like it goes into the floor.
+        // Clip-path clips the tube at the section boundary — "sinking" effect.
+        if (platEl) {
+          const mascotFeetY = newMascotTop + mascotH
+          const tubeVisualTop = mascotFeetY - 5         // slight overlap with feet
+          const tubeH = Math.max(10, window.innerHeight + 60 - tubeVisualTop)
+          // translateY(-50%) active → css_top = visualTop + height/2
+          platEl.style.top = `${tubeVisualTop + tubeH / 2}px`
+          // Clip at section boundary so tube appears to sink into the floor
+          if (partnersRect.top < window.innerHeight) {
+            const clipFromBottom = (tubeVisualTop + tubeH) - partnersRect.top
+            platEl.style.clipPath = `inset(0 0 ${clipFromBottom}px 0)`
+          } else {
+            platEl.style.clipPath = 'none'
+          }
+          const tubeEl = platEl.querySelector('.elevator-tube') as HTMLElement
+          if (tubeEl) tubeEl.style.height = `${tubeH}px`
+        }
+
+        // Fade out once section has fully scrolled past viewport
+        if (partnersRect.bottom < -80) {
+          mascotEl.style.opacity = '0'
+          if (platEl) platEl.style.opacity = '0'
+        } else if (partnersRect.top < window.innerHeight + 50) {
+          mascotEl.style.opacity = '1'
+          if (platEl) platEl.style.opacity = '1'
+        }
+      }
+
+      gsap.ticker.add(elevatorTicker)
+      scrollTickerRef.current = elevatorTicker
+    }
+
+    return () => {
+      if (scrollTickerRef.current) gsap.ticker.remove(scrollTickerRef.current)
+    }
   }, { scope: heroRef })
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 bg-[#0A0A0A]">
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center px-4 bg-black">
       {/* Intro overlay */}
-      <div ref={overlayRef} className="fixed inset-0 z-50 bg-[#0A0A0A] flex items-center justify-center pointer-events-none">
+      <div ref={overlayRef} className="fixed inset-0 z-50 bg-black flex items-center justify-center pointer-events-none">
         <span ref={welcomeRef} className="text-white font-[var(--font-display)] text-[clamp(4rem,15vw,12rem)] font-bold uppercase opacity-0">
           WELCOME
         </span>
@@ -464,9 +592,6 @@ export default function Hero() {
         </span>
       </div>
 
-      {/* Ambient effects */}
-      <div className="hero-ambient" />
-      <div className="hero-grid" />
       <div className="film-grain absolute inset-0 pointer-events-none z-40" />
 
       {/* Floating particles */}
@@ -499,8 +624,10 @@ export default function Hero() {
           {/* Mascot video — has its own ref so it can drop independently */}
           <div ref={mascotRef} className="mascot-video relative w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto -my-2 md:-my-4"
             style={{
-              mask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
-              WebkitMask: 'radial-gradient(ellipse 85% 85% at center, black 50%, transparent 90%)',
+              background: '#000000',
+              overflow: 'hidden',
+              mask: 'radial-gradient(ellipse 85% 80% at center 45%, black 50%, transparent 90%)',
+              WebkitMask: 'radial-gradient(ellipse 85% 80% at center 45%, black 50%, transparent 90%)',
             }}
           >
             <video
@@ -536,22 +663,72 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Platform — thin subtle ledge under mascot */}
-        <div ref={platformRef} className="fixed z-20" style={{ bottom: '15%', right: '10%', opacity: 0 }}>
-          <div className="relative w-full">
-            {/* Thin bright top edge */}
-            <div className="w-full h-[2px] rounded-full"
-              style={{
-                background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 70%, transparent 95%)',
-              }} />
-            {/* Subtle shadow below */}
-            <div className="w-[80%] mx-auto h-3 rounded-full blur-sm mt-[1px]"
-              style={{ background: 'rgba(255,255,255,0.03)' }} />
+        {/* Elevator tube — fixed container for mascot descent */}
+        <div ref={platformRef} className="fixed z-20" style={{ right: '3%', top: '50%', transform: 'translateY(-50%)', opacity: 0 }}>
+          <div className="elevator-tube relative" style={{ width: '100%', height: '500px' }}>
+            {/* Tube glass walls — left */}
+            <div className="absolute left-0 top-0 bottom-0" style={{
+              width: '3px',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(255,107,44,0.7) 15%, rgba(255,107,44,0.5) 50%, rgba(255,107,44,0.7) 85%, transparent 100%)',
+              boxShadow: '0 0 15px rgba(255,107,44,0.4), 3px 0 30px rgba(255,107,44,0.15), 0 0 40px rgba(255,107,44,0.1)',
+            }} />
+            {/* Tube glass walls — right */}
+            <div className="absolute right-0 top-0 bottom-0" style={{
+              width: '3px',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(255,107,44,0.7) 15%, rgba(255,107,44,0.5) 50%, rgba(255,107,44,0.7) 85%, transparent 100%)',
+              boxShadow: '0 0 15px rgba(255,107,44,0.4), -3px 0 30px rgba(255,107,44,0.15), 0 0 40px rgba(255,107,44,0.1)',
+            }} />
+            {/* Top cap — elliptical ring */}
+            <div className="absolute top-0 left-0 right-0" style={{
+              height: '20px',
+              borderRadius: '50%',
+              border: '2px solid rgba(255,107,44,0.6)',
+              background: 'linear-gradient(180deg, rgba(255,107,44,0.15) 0%, transparent 100%)',
+              boxShadow: '0 0 25px rgba(255,107,44,0.3), 0 0 50px rgba(255,107,44,0.1)',
+            }} />
+            {/* Bottom cap — elliptical ring with glow */}
+            <div className="absolute bottom-0 left-0 right-0" style={{
+              height: '20px',
+              borderRadius: '50%',
+              border: '2px solid rgba(255,107,44,0.7)',
+              background: 'linear-gradient(180deg, transparent 0%, rgba(255,107,44,0.2) 100%)',
+              boxShadow: '0 0 30px rgba(255,107,44,0.4), 0 5px 40px rgba(255,107,44,0.2), 0 0 80px rgba(255,107,44,0.1)',
+            }} />
+            {/* Glass reflection — left side */}
+            <div className="absolute top-6 bottom-6 left-3 pointer-events-none" style={{
+              width: '1px',
+              background: 'linear-gradient(180deg, transparent 10%, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.04) 70%, transparent 90%)',
+            }} />
+            {/* Glass reflection — right side */}
+            <div className="absolute top-6 bottom-6 right-3 pointer-events-none" style={{
+              width: '1px',
+              background: 'linear-gradient(180deg, transparent 10%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.03) 70%, transparent 90%)',
+            }} />
+            {/* Scan line animation — two lines offset by half cycle */}
+            <div className="absolute left-0 right-0" style={{
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, rgba(255,107,44,0.6), rgba(255,255,255,0.3), rgba(255,107,44,0.6), transparent)',
+              boxShadow: '0 0 10px rgba(255,107,44,0.3)',
+              animation: 'tube-scan 3s ease-in-out infinite',
+            }} />
+            <div className="absolute left-0 right-0" style={{
+              height: '2px',
+              background: 'linear-gradient(90deg, transparent, rgba(255,107,44,0.4), rgba(255,255,255,0.2), rgba(255,107,44,0.4), transparent)',
+              boxShadow: '0 0 8px rgba(255,107,44,0.2)',
+              animation: 'tube-scan 3s ease-in-out infinite',
+              animationDelay: '1.5s',
+            }} />
+            {/* Inner ambient glow */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: 'radial-gradient(ellipse 80% 40% at center 60%, rgba(255,107,44,0.06) 0%, transparent 70%)',
+            }} />
           </div>
         </div>
 
-        {/* Tagline — shoots from right, resolves on left */}
-        <div ref={taglineRef} className="fixed left-[5%] top-1/2 -translate-y-1/2 z-30 text-left" style={{ opacity: 0 }}>
+      </div>
+
+      {/* Tagline — direct child of section so top:50vh = true viewport center */}
+      <div ref={taglineRef} className="absolute z-30 text-left" style={{ opacity: 0, top: '50vh', left: '5vw', transform: 'translateY(-50%)' }}>
           <div className="flex flex-col gap-1">
             {/* Line 1: Deploy Your */}
             <div>
@@ -610,7 +787,6 @@ export default function Hero() {
             Engineers of Autonomy
           </p>
         </div>
-      </div>
 
       {/* Scroll indicator */}
       <div className="scroll-indicator absolute bottom-8 left-1/2 -translate-x-1/2">
