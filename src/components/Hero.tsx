@@ -276,33 +276,18 @@ export default function Hero() {
     splitTLRef.current = splitTL
 
     // Phase 1: AGENTIC slides LEFT, MONKEY+mascot slides RIGHT (0–1.2s)
-    // Flags prevent double-firing between onUpdate (98%) and onComplete (fallback)
-    let agenticExploded = false
-    let monkeyExploded = false
-
     splitTL.to(agenticRef.current, {
       x: () => {
         const firstChar = document.querySelector('.agentic-char')
         if (!firstChar) return -500
         return -firstChar.getBoundingClientRect().left
       },
-      duration: 1.0,
-      ease: 'power4.in',
-      onStart: () => { agenticExploded = false; glitchText('.agentic-char', 999999, false) },
-      onUpdate: function(this: any) {
-        // Fire at 98% progress — triggers AT wall impact, not 1 frame after
-        if (!agenticExploded && this.progress() >= 0.98) {
-          agenticExploded = true
-          createCharacterExplosion('.agentic-char')
-          gsap.set(agenticRef.current, { opacity: 0 })
-        }
-      },
+      duration: 0.65,
+      ease: 'power2.in', // steady acceleration — character reaches wall predictably
+      onStart: () => { glitchText('.agentic-char', 999999, false) },
       onComplete: () => {
-        if (!agenticExploded) { // safety fallback
-          agenticExploded = true
-          createCharacterExplosion('.agentic-char')
-          gsap.set(agenticRef.current, { opacity: 0 })
-        }
+        createCharacterExplosion('.agentic-char')
+        gsap.set(agenticRef.current, { opacity: 0 })
       },
     }, 0)
 
@@ -313,22 +298,12 @@ export default function Hero() {
         if (!lastChar) return 500
         return window.innerWidth - lastChar.getBoundingClientRect().right
       },
-      duration: 1.0,
-      ease: 'power4.in',
-      onStart: () => { monkeyExploded = false; glitchText('.monkey-char', 999999, false) },
-      onUpdate: function(this: any) {
-        if (!monkeyExploded && this.progress() >= 0.98) {
-          monkeyExploded = true
-          createCharacterExplosion()
-          gsap.set('.monkey-text', { opacity: 0 })
-        }
-      },
+      duration: 0.65,
+      ease: 'power2.in',
+      onStart: () => { glitchText('.monkey-char', 999999, false) },
       onComplete: () => {
-        if (!monkeyExploded) {
-          monkeyExploded = true
-          createCharacterExplosion()
-          gsap.set('.monkey-text', { opacity: 0 })
-        }
+        createCharacterExplosion()
+        gsap.set('.monkey-text', { opacity: 0 })
       },
     }, 0)
 
