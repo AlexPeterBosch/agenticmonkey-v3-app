@@ -3,7 +3,7 @@
 @theme {
   --color-primary: #000000;
   --color-dark: #000000;
-  --color-dark-surface: #0A0A0A;
+  --color-dark-surface: #000000;
   --color-cyan: #00D4FF;
   --color-cyan-dark: #00B8E0;
   --color-orange: #FF6B2C;
@@ -18,7 +18,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #050505;
+  background-color: #000000;
   color: #FFFFFF;
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -437,6 +437,20 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar-glass {
   animation: navbar-border-glow 4s ease-in-out infinite;
+}
+
+/* Platform pulse animation */
+@keyframes platform-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+/* Elevator tube scan line */
+@keyframes tube-scan {
+  0% { top: 5%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
 }
 
 /* Subtle noise texture for depth */

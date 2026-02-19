@@ -11,7 +11,7 @@ export default function GridLines() {
     if (!fillRef.current) return
 
     gsap.to(fillRef.current, {
-      height: '100%',
+      scaleY: 1,
       ease: 'none',
       scrollTrigger: {
         trigger: document.body,
@@ -51,9 +51,12 @@ export default function GridLines() {
                   top: 0,
                   left: 0,
                   width: '100%',
-                  height: '0%',
+                  height: '100%',
+                  transform: 'scaleY(0)',
+                  transformOrigin: 'top',
                   backgroundColor: '#FF6B2C',
                   opacity: 0.15,
+                  willChange: 'transform',
                 }}
               />
             )}
