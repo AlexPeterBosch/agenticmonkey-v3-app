@@ -439,6 +439,20 @@ h1, h2, h3, h4, h5, h6 {
   animation: navbar-border-glow 4s ease-in-out infinite;
 }
 
+/* Platform pulse animation */
+@keyframes platform-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+/* Elevator tube scan line */
+@keyframes tube-scan {
+  0% { top: 5%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
 /* Subtle noise texture for depth */
 .noise-overlay::after {
   content: '';

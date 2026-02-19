@@ -17,7 +17,7 @@ export default function PartnersMarquee() {
   const items = [...partners, ...partners, ...partners]
 
   return (
-    <section className="py-10 border-y border-white/5 bg-black relative z-10">
+    <section id="partners-marquee" className="py-10 border-y border-white/5 bg-black relative z-10">
       <div className="max-w-7xl mx-auto px-6 mb-5">
         <p className="text-xs uppercase tracking-[0.3em] text-muted font-[var(--font-display)] font-medium">
           Powered By
