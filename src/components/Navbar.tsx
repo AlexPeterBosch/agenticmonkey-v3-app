@@ -21,21 +21,21 @@ export default function Navbar() {
 
   return (
     <>
-      <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 pt-6 px-4 md:px-6 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-5 py-3 md:px-6 md:py-3 flex items-center justify-between gap-6 md:gap-8 shadow-2xl shadow-black/50 w-full max-w-4xl">
-          <a href="#" className="flex items-center gap-3">
-            {/* <img src="/monkey-mascot.png" alt="AgenticMonkey" className="w-8 h-8 object-contain" /> */}
-            <span className="font-[var(--font-display)] font-bold text-lg md:text-xl tracking-tight text-white">
-              AGENTIC<span className="text-orange">MONKEY</span>
+      <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 pt-3 px-4 md:px-6 flex justify-center pointer-events-none" style={{ opacity: 0, transform: 'translateY(-20px)' }}>
+        <div className="navbar-glass pointer-events-auto bg-white/[0.05] backdrop-blur-2xl border border-white/[0.1] rounded-full flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] w-full max-w-4xl" style={{ padding: 'clamp(6px, 0.6vw, 12px) clamp(12px, 1.2vw, 24px)', gap: 'clamp(12px, 1.5vw, 32px)' }}>
+          <a href="#" className="flex items-center gap-2">
+            <span className="font-[var(--font-display)] font-bold tracking-tight" style={{ fontSize: 'clamp(12px, 1.1vw, 18px)' }}>
+              <span className="logo-shimmer">AGENTIC</span><span className="logo-shimmer-orange">MONKEY</span>
             </span>
           </a>
 
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center" style={{ gap: 'clamp(10px, 1.2vw, 24px)' }}>
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors font-[var(--font-body)]"
+                className="nav-link font-medium text-white/70 hover:text-white font-[var(--font-body)]"
+                style={{ fontSize: 'clamp(11px, 0.85vw, 14px)' }}
               >
                 {link.label}
               </a>
@@ -47,7 +47,8 @@ export default function Navbar() {
               href={BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-orange hover:bg-orange-dark text-white px-5 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,107,44,0.4)]"
+              className="bg-orange hover:bg-orange-dark text-white rounded-full font-semibold transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,107,44,0.4)]"
+              style={{ fontSize: 'clamp(11px, 0.85vw, 14px)', padding: 'clamp(4px, 0.5vw, 8px) clamp(10px, 1.2vw, 20px)' }}
             >
               Book a Call
             </a>

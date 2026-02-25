@@ -3,9 +3,9 @@
 @theme {
   --color-primary: #000000;
   --color-dark: #000000;
-  --color-dark-surface: #0A0A0A;
-  --color-cyan: #FF6B2C;
-  --color-cyan-dark: #E55A1B;
+  --color-dark-surface: #000000;
+  --color-cyan: #00D4FF;
+  --color-cyan-dark: #00B8E0;
   --color-orange: #FF6B2C;
   --color-orange-dark: #E55A1B;
   --color-text: #FFFFFF;
@@ -23,7 +23,45 @@ body {
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* Ambient background glow */
+@keyframes ambient-shift {
+  0%, 100% { 
+    background-position: 0% 50%;
+    opacity: 0.4;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 0.6;
+  }
+}
+
+.hero-ambient {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% 120%, rgba(255, 107, 44, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 50%, rgba(255, 80, 20, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 30%, rgba(255, 140, 60, 0.05) 0%, transparent 50%);
+  animation: ambient-shift 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid lines */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 107, 44, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 107, 44, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  z-index: 0;
+  mask: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 80%);
+  -webkit-mask: radial-gradient(ellipse 70% 70% at center, black 30%, transparent 80%);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -91,8 +129,22 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 25s linear infinite;
 }
 
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: mascot-float 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 20px 60px rgba(255, 107, 44, 0.35)); }
+  50% { filter: drop-shadow(0 20px 80px rgba(255, 107, 44, 0.55)) drop-shadow(0 0 30px rgba(255, 107, 44, 0.25)); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
 }
 
 .animate-pulse-glow {
@@ -108,11 +160,11 @@ h1, h2, h3, h4, h5, h6 {
   bottom: -50%;
   width: 300%;
   height: 300%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
   animation: film-grain 8s steps(10) infinite;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.15;
 }
 
 .text-stroke {
@@ -121,8 +173,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-stroke-visible {
-  -webkit-text-stroke: 3px #FFFFFF;
-  color: rgba(255, 255, 255, 0.05);
+  -webkit-text-stroke: 4px rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.08);
   paint-order: stroke fill;
 }
 
@@ -227,8 +279,187 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #FF6B2C, #FF9A6C);
+  background: linear-gradient(135deg, #FF6B2C, #FFAA70);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Cursor glow — premium touch */
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 44, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  will-change: left, top;
+}
+
+/* Smooth section divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 107, 44, 0.15), transparent);
+}
+
+/* ── Navbar premium animations ── */
+
+/* 1. Nav link underline slide-in */
+@keyframes nav-underline-glow {
+  0% { box-shadow: 0 0 4px rgba(255, 107, 44, 0.4); }
+  100% { box-shadow: 0 0 8px rgba(255, 107, 44, 0.6); }
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #FF6B2C, #FFAA70);
+  border-radius: 1px;
+  transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 0 6px rgba(255, 107, 44, 0.5);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* 5 & 6. Nav link scale + background glow on hover */
+.nav-link:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 12px rgba(255, 107, 44, 0.3);
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: -4px -8px;
+  border-radius: 8px;
+  background: radial-gradient(ellipse, rgba(255, 107, 44, 0.12), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+}
+
+.nav-link:hover::before {
+  opacity: 1;
+}
+
+/* 2. Book a Call shimmer sweep */
+@keyframes btn-shimmer {
+  0% { left: -100%; }
+  20% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.nav-cta {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nav-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: btn-shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.nav-cta:hover {
+  box-shadow: 0 0 24px rgba(255, 107, 44, 0.5), 0 0 48px rgba(255, 107, 44, 0.2);
+}
+
+/* 3. Logo gradient shimmer */
+@keyframes logo-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.logo-shimmer {
+  background: linear-gradient(
+    90deg,
+    #FFFFFF 0%,
+    #FFFFFF 35%,
+    #FFAA70 50%,
+    #FFFFFF 65%,
+    #FFFFFF 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logo-shimmer 6s ease-in-out infinite;
+}
+
+.logo-shimmer-orange {
+  background: linear-gradient(
+    90deg,
+    #FF6B2C 0%,
+    #FF6B2C 35%,
+    #FFDD99 50%,
+    #FF6B2C 65%,
+    #FF6B2C 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logo-shimmer 6s ease-in-out infinite;
+}
+
+/* 4. Navbar container border glow pulse */
+@keyframes navbar-border-glow {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.1); }
+  50% { border-color: rgba(255, 107, 44, 0.2); }
+}
+
+.navbar-glass {
+  animation: navbar-border-glow 4s ease-in-out infinite;
+}
+
+/* Platform pulse animation */
+@keyframes platform-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+/* Elevator tube scan line */
+@keyframes tube-scan {
+  0% { top: 5%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 90%; opacity: 0; }
+}
+
+/* Subtle noise texture for depth */
+.noise-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.4;
 }

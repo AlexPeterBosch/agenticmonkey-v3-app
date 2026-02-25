@@ -6,15 +6,15 @@ import { Bot, Workflow, Database, Code2, Lightbulb, Plug } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const categories = ['All', 'AI', 'Automation', 'Development', 'Consulting']
+const categories = ['All', 'Agents', 'Automation', 'Strategy']
 
 const services = [
-  { num: '01', title: 'AI Agent Development', desc: 'Custom autonomous agents that handle complex workflows, make decisions, and take action — without human intervention.', cat: 'AI', icon: Bot, span: 'md:col-span-2 md:row-span-2' },
-  { num: '02', title: 'Workflow Automation', desc: 'End-to-end automation pipelines that connect your tools and eliminate manual work.', cat: 'Automation', icon: Workflow, span: '' },
-  { num: '03', title: 'RAG & Knowledge Systems', desc: 'Turn your documents into queryable, context-aware AI knowledge bases.', cat: 'AI', icon: Database, span: '' },
-  { num: '04', title: 'Full-Stack Development', desc: 'Modern web applications and APIs built with cutting-edge tech stacks, designed for scale.', cat: 'Development', icon: Code2, span: 'md:col-span-2' },
-  { num: '05', title: 'AI Strategy Consulting', desc: 'Expert guidance on where AI fits — practical roadmaps, not hype.', cat: 'Consulting', icon: Lightbulb, span: '' },
-  { num: '06', title: 'Custom Integrations', desc: 'Seamless connections between your existing tools and new AI capabilities.', cat: 'Automation', icon: Plug, span: '' },
+  { num: '01', title: 'AI Agent Development', desc: 'Custom autonomous agents that handle complex workflows, make decisions, and take action — without human intervention.', cat: 'Agents', icon: Bot, span: 'md:col-span-2 md:row-span-2', featured: true },
+  { num: '02', title: 'Workflow Automation', desc: 'End-to-end automation pipelines that connect your tools and eliminate manual work.', cat: 'Automation', icon: Workflow, span: '', featured: false },
+  { num: '03', title: 'RAG & Knowledge Systems', desc: 'Turn your documents into queryable, context-aware AI knowledge bases.', cat: 'Agents', icon: Database, span: '', featured: false },
+  { num: '04', title: 'Full-Stack Development', desc: 'Modern web applications and APIs built with cutting-edge tech stacks, designed for scale.', cat: 'Automation', icon: Code2, span: 'md:col-span-2', featured: false },
+  { num: '05', title: 'AI Strategy Consulting', desc: 'Expert guidance on where AI fits — practical roadmaps, not hype.', cat: 'Strategy', icon: Lightbulb, span: '', featured: false },
+  { num: '06', title: 'Custom Integrations', desc: 'Seamless connections between your existing tools and new AI capabilities.', cat: 'Automation', icon: Plug, span: '', featured: false },
 ]
 
 export default function Services() {
@@ -30,8 +30,7 @@ export default function Services() {
       scrollTrigger: {
         trigger: '.services-heading',
         start: 'top 85%',
-        end: 'top 50%',
-        scrub: true,
+        toggleActions: 'play none none none',
       },
     })
 
@@ -52,7 +51,7 @@ export default function Services() {
   }, { scope: sectionRef, dependencies: [active] })
 
   return (
-    <section id="services" ref={sectionRef} className="bg-black text-white py-24 md:py-32 relative z-10">
+    <section id="services" ref={sectionRef} className="bg-black text-white py-20 md:py-28 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="services-heading">
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight">
@@ -83,23 +82,37 @@ export default function Services() {
               key={service.num}
               className={`service-card group ${service.span}`}
             >
-              <div className="relative bg-[#0A0A0A] rounded-3xl p-8 md:p-10 border border-white/10 hover:border-orange/30 transition-all hover:shadow-[0_0_30px_rgba(255,107,44,0.1)] h-full flex flex-col justify-between overflow-hidden">
-                <span className="font-[var(--font-display)] text-7xl md:text-8xl font-bold text-white/[0.03] absolute -top-2 -right-2">
+              <div className={`relative rounded-3xl p-8 md:p-10 border transition-all duration-500 h-full flex flex-col justify-between overflow-hidden group-hover:-translate-y-1 ${
+                service.featured 
+                  ? 'bg-gradient-to-br from-[#0A0A0A] to-[#111] border-orange/20 hover:border-orange/50 shadow-[0_0_40px_rgba(255,107,44,0.08)] hover:shadow-[0_0_60px_rgba(255,107,44,0.2)]'
+                  : 'bg-[#0A0A0A] border-white/10 hover:border-orange/30 hover:shadow-[0_0_40px_rgba(255,107,44,0.12)] hover:bg-[#0D0D0D]'
+              }`}>
+                <span className={`font-[var(--font-display)] font-bold absolute -top-2 -right-2 ${
+                  service.featured ? 'text-8xl md:text-9xl text-orange/[0.06]' : 'text-7xl md:text-8xl text-white/[0.03]'
+                }`}>
                   {service.num}
                 </span>
                 <div>
-                  <div className="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange/20 group-hover:scale-110 transition-all">
-                    <service.icon className="w-7 h-7 text-orange" />
+                  <div className={`rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all ${
+                    service.featured ? 'w-16 h-16 bg-orange/15 group-hover:bg-orange/25' : 'w-14 h-14 bg-orange/10 group-hover:bg-orange/20'
+                  }`}>
+                    <service.icon className={`text-orange ${service.featured ? 'w-8 h-8' : 'w-7 h-7'}`} />
                   </div>
-                  <h3 className="font-[var(--font-display)] text-2xl md:text-3xl font-bold mb-3 group-hover:text-orange transition-colors">
+                  <h3 className={`font-[var(--font-display)] font-bold mb-3 group-hover:text-orange transition-colors ${
+                    service.featured ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'
+                  }`}>
                     {service.title}
                   </h3>
-                  <p className="text-muted text-base leading-relaxed font-[var(--font-body)]">
+                  <p className={`text-muted leading-relaxed font-[var(--font-body)] ${
+                    service.featured ? 'text-base md:text-lg' : 'text-base'
+                  }`}>
                     {service.desc}
                   </p>
                 </div>
                 <div className="mt-6">
-                  <span className="text-white/20 group-hover:text-orange group-hover:translate-x-2 transition-all text-xl inline-block">
+                  <span className={`text-white/20 group-hover:text-orange group-hover:translate-x-2 transition-all inline-block ${
+                    service.featured ? 'text-2xl' : 'text-xl'
+                  }`}>
                     &rarr;
                   </span>
                 </div>

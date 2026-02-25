@@ -47,7 +47,7 @@ export default function MascotInteractive({ className = '', glowColor = 'rgba(25
       </div>
 
       <img
-        src="/mascot-hero-v3.png"
+        src="/mascot-hero-v3.webp"
         alt="AgenticMonkey — AI Automation Mascot"
         className={`mascot-breathe relative z-10 ${className}`}
         style={{
